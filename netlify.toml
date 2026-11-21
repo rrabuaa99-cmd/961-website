@@ -1,0 +1,7 @@
+# Netlify settings for the +961 site
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
