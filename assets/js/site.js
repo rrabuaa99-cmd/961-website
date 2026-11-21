@@ -856,9 +856,7 @@
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || !(j.success === true || j.success === 'true')) {
-            var err = new Error(j.message || 'HTTP ' + r.status);
-            err.needsActivation = /activat/i.test(j.message || '');
-            throw err;
+            throw new Error(j.message || 'HTTP ' + r.status);
           }
         });
       }).then(function () { clearTimeout(timer); }, function (err) { clearTimeout(timer); throw err; });
@@ -893,9 +891,8 @@
       setSending(true);
       sendOrder(o, statusFor(o)).then(function () { showConfirmation(o, kind); }, function (err) {
         setSending(false);
-        showNotice(err && err.needsActivation
-          ? 'Online orders are being switched on and this order was not sent. Please send it on WhatsApp instead.'
-          : 'We could not send your order. Check your connection and try again, or send it on WhatsApp instead.', o);
+        if (window.console) console.warn('Order email failed:', err && err.message);
+        showNotice('We could not send your order. Check your connection and try again, or send it on WhatsApp instead.', o);
       });
     }, sig);
 
