@@ -39,13 +39,9 @@ Both settings are at the top of `assets/js/site.js`, inside `CONFIG`.
 
 **1. Orders by email (already set up)**
 
-Every order is emailed to **rrabuaa99@gmail.com** through FormSubmit (formsubmit.co, free). Each email lists the order number, order summary, subtotal, delivery fee, total, full name, phone number, email, delivery (Lebanon or the country abroad), city or area, full address, order notes and payment.
+Every order is emailed to **rrabuaa99@gmail.com** through Web3Forms (web3forms.com, free). Each email lists the order number, order summary, subtotal, delivery fee, total, full name, phone number, email, delivery (Lebanon or the country abroad), city or area, full address, order notes and payment. If the customer gave an email, pressing Reply answers them.
 
-One-time step: the very first order sends rrabuaa99@gmail.com an email from FormSubmit with an "Activate Form" button. Click it once, then place a second test order. Every order after that arrives in your inbox. Check your spam folder if you don't see it.
-
-To hide the address from the website code: the activation email from FormSubmit also gives you a random string. Replace `orderEmail: 'rrabuaa99@gmail.com'` in `assets/js/site.js` with that string. Orders still arrive at the same inbox.
-
-To use another inbox, change `orderEmail` and activate it the same way.
+The access key is `web3formsKey` in `assets/js/site.js`. It is linked to rrabuaa99@gmail.com and is public by design. To send orders to another inbox, create a new key at web3forms.com with that address and replace it.
 
 **2. Card payments (Stripe: Visa and Mastercard)**
 

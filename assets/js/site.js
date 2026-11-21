@@ -14,10 +14,9 @@
     instagram: 'https://www.instagram.com/961o.fficial/',
     deliveryLebanon: 4,                  // PLACEHOLDER: delivery fee in USD inside Lebanon
 
-    // Every order is emailed to this address through FormSubmit (formsubmit.co, free).
-    // The very first order sends this address an "Activate Form" email. Click the
-    // button in it once, and every order after that arrives in the inbox.
-    orderEmail: 'rrabuaa99@gmail.com',
+    // Every order is emailed to rrabuaa99@gmail.com through Web3Forms (free).
+    // This access key is linked to that inbox. It is public by design.
+    web3formsKey: '4537d6ea-4e0d-40dd-b674-000211899699',
 
     // SETUP 2: card payments with Stripe (Visa, Mastercard). Paste your Stripe
     // PUBLISHABLE key (pk_live_...) here. The SECRET key goes in Netlify, never here.
@@ -631,7 +630,7 @@
   }
 
   /* checkout */
-  function orderEndpoint() { return 'https://formsubmit.co/ajax/' + CONFIG.orderEmail; }
+  var ORDER_ENDPOINT = 'https://api.web3forms.com/submit';
   var stripeLoad = null;
   function loadStripe() {
     if (stripeLoad) return stripeLoad;
@@ -824,9 +823,10 @@
       var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
       // The email lists the order in the same order as the checkout form
       var body = {
-        _subject: subject || 'New +961 order ' + o.ref + ': ' + totalText(o) + ', ' + o.payLabel,
-        _template: 'table',
-        _captcha: 'false',
+        access_key: CONFIG.web3formsKey,
+        subject: subject || 'New +961 order ' + o.ref + ': ' + totalText(o) + ', ' + o.payLabel,
+        from_name: '+961 Website',
+        botcheck: false,
         'Order number': o.ref,
         'Order summary': o.items.map(function (i) {
           var p = PRODUCTS[i.id];
@@ -844,8 +844,8 @@
         'Order notes': o.notes || 'None',
         'Payment': status
       };
-      if (o.email) body._replyto = o.email;                      // press Reply to answer the customer
-      return fetch(orderEndpoint(), {
+      if (o.email) body.replyto = o.email;                       // press Reply to answer the customer
+      return fetch(ORDER_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(body),
@@ -886,7 +886,7 @@
       if (paysByCard()) { startCard(o); return; }
       var kind = o.intl ? 'intl' : o.payment;
       if (EMBEDDED) { showConfirmation(o, kind, { preview: true }); return; }
-      if (!CONFIG.orderEmail) { showNotice('Online orders are not switched on yet. Send this order on WhatsApp and we will confirm it there.', o); return; }
+      if (!CONFIG.web3formsKey) { showNotice('Online orders are not switched on yet. Send this order on WhatsApp and we will confirm it there.', o); return; }
       setSending(true);
       sendOrder(o, statusFor(o)).then(function () { showConfirmation(o, kind); }, function (err) {
         setSending(false);
@@ -966,7 +966,7 @@
     function onCardComplete() {
       var o = cardOrder;
       var done = function () { showConfirmation(o, 'card'); };
-      if (!CONFIG.orderEmail) { o.mailFailed = true; done(); return; }
+      if (!CONFIG.web3formsKey) { o.mailFailed = true; done(); return; }
       sendOrder(o, statusFor(o)).then(done, function () { o.mailFailed = true; done(); });
     }
 
