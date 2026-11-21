@@ -136,6 +136,8 @@
   var cartEl = $('#cart');
   function renderCart() {
     var n = Cart.count();
+    root.classList.toggle('has-bag', n > 0);
+    root.style.setProperty('--bag-lines', Cart.items.length);
     try { doc.dispatchEvent(new CustomEvent('961:cart')); } catch (e) { /* old browser */ }
     $$('[data-cart-count]').forEach(function (el) {
       el.classList.toggle('has-items', n > 0);
@@ -344,7 +346,7 @@
   /* ------------------------------------------------------------------ header, progress, floating button */
   var header = $('#header'), progressBar = $('.progress span'), fab = $('.fab');
   var themed = [], ticking = false;
-  function collectThemed() { themed = $$('main > [data-theme], main > * > [data-theme].section, .footer'); }
+  function collectThemed() { themed = $$('main > [data-theme], main > * > [data-theme].section, .footer'); avoidEls = $$('[data-fab-avoid]'); }
   function updateChrome() {
     ticking = false;
     var y = window.scrollY || root.scrollTop || 0;
@@ -366,12 +368,23 @@
       var max = root.scrollHeight - vh;
       progressBar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, y / max) : 0) + ')';
     }
-    if (fab) {
+    if (fab) checkFab(vh);
+  }
+  // The floating button checks what sits under it at most every 120 ms, plus once
+  // when scrolling stops, instead of on every frame.
+  var fabLast = 0, fabTimer = null, avoidEls = [];
+  function checkFab(vh) {
+    clearTimeout(fabTimer);
+    if (layers.length) { fab.classList.add('is-hidden'); return; }
+    var now = Date.now();
+    if (now - fabLast < 120) { fabTimer = setTimeout(function () { checkFab(window.innerHeight); }, 140); return; }
+    fabLast = now;
+    {
       var hide = layers.length > 0;
       if (!hide) {
         var fr = fab.getBoundingClientRect();
         var band = fr.top - 16;
-        $$('[data-fab-avoid]').forEach(function (el) {
+        avoidEls.forEach(function (el) {
           var r = el.getBoundingClientRect();
           if (r.height && r.top < vh && r.bottom > band) hide = true;
         });

@@ -20,12 +20,11 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/css/site.css?v=73341509">
+  <link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/eb-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css?v=61c95a0d">
   <style>.is-entering .curtain{animation:curtain-safety 0s 2.5s forwards}@keyframes curtain-safety{to{visibility:hidden}}</style>
-  <script>(function(){var d=document.documentElement;d.classList.add('js');try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!localStorage.getItem('961-intro'))d.classList.add('has-intro');if(sessionStorage.getItem('961-nav')){sessionStorage.removeItem('961-nav');d.classList.add('is-entering');}}catch(e){}})();</script>
+  <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=JSON.parse(localStorage.getItem('961-cart')||'[]');if(Array.isArray(c)&&c.length){d.classList.add('has-bag');d.style.setProperty('--bag-lines',c.length)}}catch(e){}try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!localStorage.getItem('961-intro'))d.classList.add('has-intro');if(sessionStorage.getItem('961-nav')){sessionStorage.removeItem('961-nav');d.classList.add('is-entering');}}catch(e){}})();</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"+961 T-Shirt","color":"White","brand":{"@type":"Brand","name":"+961"},"description":"A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.","image":["assets/img/tshirt-front-1000.webp","assets/img/tshirt-back-1000.webp"],"offers":{"@type":"Offer","price":"15","priceCurrency":"USD","availability":"https://schema.org/InStock","url":"t-shirt.html"}}</script>
 </head>
 <body>
@@ -117,7 +116,7 @@
           <a class="link" href="shop.html" data-reveal>Shop all <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M14 7l5 5-5 5"/></svg></a>
         </div>
         <div class="pair__card cards" data-reveal-group><article class="card" data-reveal-item>
-          <a class="card__link" href="hoodie.html" aria-label="+961 Hoodie, Black, $21">
+          <a class="card__link" href="hoodie.html" aria-label="+961 Hoodie $21 Black">
             <div class="card__media media tile--light" data-mask>
               <div class="mask__in"><div class="mask__img">
                 <img class="card__img card__img--front" src="assets/img/hoodie-front-600.webp" srcset="assets/img/hoodie-front-600.webp 600w, assets/img/hoodie-front-1000.webp 1000w" sizes="(min-width: 1024px) 40vw, 50vw" width="1000" height="1250" loading="lazy" decoding="async" alt="+961 Hoodie in black, front view with a small white +961 print on the chest">
@@ -128,7 +127,7 @@
               <h3 class="card__name">+961 Hoodie</h3>
               <p class="card__price">$21</p>
             </div>
-            <p class="card__meta"><span>Black</span><span class="card__view">View</span></p>
+            <p class="card__meta"><span>Black</span><span class="card__view" aria-hidden="true">View</span></p>
           </a>
         </article></div>
       </div>
@@ -248,10 +247,10 @@
   <div class="intro" aria-hidden="true"><div class="intro__word"><span>+</span><span>9</span><span>6</span><span>1</span></div></div>
   <div class="cursor" aria-hidden="true"><span class="cursor__ring"></span><span class="cursor__dot"></span></div>
   <p class="sr-only" id="route-announcer" aria-live="polite"></p>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <script src="assets/vendor/gsap.min.js?v=3.12.5" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js?v=3.12.5" defer></script>
+  <script src="assets/vendor/lenis.min.js?v=1.1.13" defer></script>
   <script src="assets/js/content.js?v=32404138" defer></script>
-  <script src="assets/js/site.js?v=e1c5f7f6" defer></script>
+  <script src="assets/js/site.js?v=6c425cc8" defer></script>
 </body>
 </html>

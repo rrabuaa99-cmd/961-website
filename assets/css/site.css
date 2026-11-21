@@ -1,3 +1,9 @@
+@font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/inter-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-style:normal;font-weight:500;font-display:swap;src:url("../fonts/inter-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url("../fonts/inter-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"EB Garamond";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/eb-garamond-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"EB Garamond";font-style:normal;font-weight:500;font-display:swap;src:url("../fonts/eb-garamond-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"EB Garamond";font-style:italic;font-weight:400;font-display:swap;src:url("../fonts/eb-garamond-latin-400-italic.woff2") format("woff2")}
 /* ==========================================================================
    +961 — site styles
    Layout: 12-column grid, 1440px max width, 8px spacing scale.
@@ -136,9 +142,9 @@ em, .italic { font-style: italic; }
 
 /* split text */
 .split-line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
-.split-line__in { display: block; will-change: transform; }
+.split-line__in { display: block; }
 .split-char { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; margin-bottom: -.06em; }
-.split-char__in { display: inline-block; will-change: transform; }
+.split-char__in { display: inline-block; }
 
 /* ---------- links ---------- */
 .link {
@@ -607,7 +613,7 @@ html.has-cursor input, html.has-cursor textarea { cursor: text; }
 }
 
 .statement { overflow: hidden; padding-block: calc(var(--section) * 1.1); }
-.statement__type { font-family: var(--serif); font-weight: 500; font-variant-numeric: lining-nums; font-size: clamp(140px, 36vw, 560px); line-height: .82; letter-spacing: -.04em; white-space: nowrap; text-align: center; will-change: transform; }
+.statement__type { font-family: var(--serif); font-weight: 500; font-variant-numeric: lining-nums; font-size: clamp(140px, 36vw, 560px); line-height: .82; letter-spacing: -.04em; white-space: nowrap; text-align: center; }
 .statement__foot { display: grid; gap: var(--s3); margin-top: var(--s8); }
 @media (min-width: 768px) { .statement__foot { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); } .statement__foot > :first-child { grid-column: 1 / span 5; } .statement__foot > :last-child { grid-column: 8 / span 5; } }
 
@@ -833,7 +839,7 @@ html.has-cursor .pdp__slide button { cursor: none; }
 }
 .chapter__media .media { aspect-ratio: 4 / 5; }
 .cities { overflow: hidden; padding-block: var(--s6); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.cities__track { display: flex; gap: var(--s6); white-space: nowrap; font-family: var(--serif); font-size: clamp(40px, 6vw, 88px); line-height: 1; font-weight: 500; will-change: transform; }
+.cities__track { display: flex; gap: var(--s6); white-space: nowrap; font-family: var(--serif); font-size: clamp(40px, 6vw, 88px); line-height: 1; font-weight: 500; }
 .cities__track span { display: inline-flex; align-items: center; gap: var(--s6); }
 .cities__track span::after { content: ""; width: 8px; height: 8px; background: currentColor; display: inline-block; }
 .closing { text-align: left; display: grid; gap: var(--s4); justify-items: start; }
@@ -1011,3 +1017,39 @@ textarea.field__input { height: auto; min-height: 112px; padding: var(--s2); res
 .confirm h1:focus { outline: none; }
 .confirm__preview { margin-top: var(--s2); padding: 12px var(--s2); border: 1px dashed var(--line-strong); border-radius: var(--radius); color: var(--muted); }
 
+
+/* ---------- performance on phones and tablets ---------- */
+a, button, label, input, textarea { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (max-width: 1023px), (hover: none) {
+  /* a live blur behind the header is costly while scrolling on phones: use a solid colour */
+  .header__bg { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .header[data-theme="light"] { --hbg: rgba(255, 255, 255, .97); }
+  .header[data-theme="dark"] { --hbg: rgba(10, 10, 10, .97); }
+}
+
+/* checkout knows before the first paint whether the bag has items, and keeps room for them */
+html:not(.has-bag) [data-co-layout] { display: none; }
+html.has-bag .co__empty { display: none; }
+.summary__lines { min-height: max(0px, calc(var(--bag-lines, 0) * 96px - 16px)); }
+
+/* bigger tap areas for small text links, same look */
+.footer__col { gap: 4px; }
+.footer__col .label { margin-bottom: 12px; }
+.footer__col a { padding-block: 6px; }
+.footer__col a::after { bottom: 4px; }
+.summary__edit { padding: 8px 0; }
+
+/* small and short phones: a slightly smaller photo so the headline shows sooner */
+@media (max-width: 767px) and (max-height: 700px) { .hero__media { height: 42svh; } }
+@media (max-width: 359px) { .display { font-size: 40px; } .h1 { font-size: 38px; } }
+
+/* phones held sideways: photo and text side by side, like on a computer */
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 600px) and (max-width: 1023px) {
+  .hero__grid { align-content: stretch; align-items: center; padding-bottom: var(--s2); }
+  .hero__text { grid-column: 1 / span 7; grid-row: 1; padding: 0; gap: var(--s2); }
+  .hero__media { grid-column: 8 / span 5; grid-row: 1; height: calc(100svh - var(--header-h) - 32px); padding: 0; }
+  .hero__title { font-size: clamp(32px, 9svh, 56px); }
+  .hero .lead { font-size: 15px; }
+  .menu__link a { font-size: clamp(32px, 9svh, 48px); }
+  .menu__inner { gap: var(--s3); padding-top: var(--s1); }
+}
