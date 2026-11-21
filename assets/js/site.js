@@ -738,6 +738,14 @@
         updateSubmit();
       }, sig);
     });
+    var billingFields = $('[data-billing-fields]', co);
+    $$('input[name="billing"]', co).forEach(function (r) {
+      r.addEventListener('change', function () {
+        billingFields.hidden = r.value !== 'different';
+        if (!billingFields.hidden) setTimeout(function () { field('billName').focus({ preventScroll: true }); }, 50);
+        if (ST) ST.refresh();
+      }, sig);
+    });
     $$('input[name="payment"]', co).forEach(function (r) {
       r.addEventListener('change', function () { $('[data-pay-error]', co).hidden = true; updateSubmit(); }, sig);
     });
@@ -783,6 +791,12 @@
     // the order
     function orderRef() { return '961-' + Date.now().toString(36).slice(-5).toUpperCase(); }
     var checkoutRef = orderRef();
+    function billingText() {
+      var r = form.querySelector('input[name="billing"]:checked');
+      if (!r || r.value === 'same') return 'Same as shipping address';
+      var parts = ['billName', 'billAddress', 'billCity', 'billCountry'].map(function (n) { return field(n).value.trim().replace(/\s*\n\s*/g, ', '); }).filter(Boolean);
+      return parts.length ? parts.join(', ') : 'Different address (not filled in)';
+    }
     function collect() {
       var f = fee();
       return {
@@ -795,6 +809,7 @@
         city: field('city').value.trim(),
         address: field('address').value.trim().replace(/\s*\n\s*/g, ', '),
         notes: field('notes').value.trim().replace(/\s*\n\s*/g, ' '),
+        billing: billingText(),
         payment: payment(), payLabel: payLabel(),
         items: Cart.items.map(function (i) { return { id: i.id, size: i.size, qty: i.qty }; }),
         subtotal: Cart.subtotal(), fee: f, total: Cart.subtotal() + (f || 0)
@@ -821,6 +836,7 @@
       ];
       if (o.email) out.push('Email: ' + o.email);
       if (o.notes) out.push('Notes: ' + o.notes);
+      if (o.billing && o.billing !== 'Same as shipping address') out.push('Billing address: ' + o.billing);
       return out.join('\n');
     }
     function statusFor(o) {
@@ -855,7 +871,8 @@
         'City / area': o.city,
         'Full address': o.address,
         'Order notes': o.notes || 'None',
-        'Payment': status
+        'Payment': status,
+        'Billing address': o.billing
       };
       if (o.email) body.replyto = o.email;                       // press Reply to answer the customer
       // Sent as a plain form, so browsers send it straight away without an extra check

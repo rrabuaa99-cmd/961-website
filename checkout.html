@@ -22,7 +22,7 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/eb-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/site.css?v=61c95a0d">
+  <link rel="stylesheet" href="assets/css/site.css?v=f72fa384">
   <style>.is-entering .curtain{animation:curtain-safety 0s 2.5s forwards}@keyframes curtain-safety{to{visibility:hidden}}</style>
   <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=JSON.parse(localStorage.getItem('961-cart')||'[]');if(Array.isArray(c)&&c.length){d.classList.add('has-bag');d.style.setProperty('--bag-lines',c.length)}}catch(e){}try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!localStorage.getItem('961-intro'))d.classList.add('has-intro');if(sessionStorage.getItem('961-nav')){sessionStorage.removeItem('961-nav');d.classList.add('is-entering');}}catch(e){}})();</script>
   
@@ -129,6 +129,35 @@
                 <div class="choice" data-quote-choice hidden><input type="radio" name="payment" id="pay-quote" value="quote" data-label="After the shipping quote"><label for="pay-quote"><span class="choice__mark" aria-hidden="true"></span><span class="choice__title">Pay after the shipping quote</span><span class="choice__text">We contact you with the shipping cost and how to pay. Nothing is charged now.</span></label></div>
               </div>
               <p class="field__error" data-pay-error hidden style="display:flex">Choose a payment method.</p>
+            </fieldset>
+
+            <fieldset class="co__step">
+              <legend class="sr-only">Billing address (optional)</legend>
+              <div class="co__step-head" aria-hidden="true"><span class="co__step-num">4</span><span class="h3">Billing address</span><span class="tag">Optional</span></div>
+              <div class="choices" role="radiogroup" aria-label="Billing address">
+                <div class="choice choice--simple"><input type="radio" name="billing" id="bill-same" value="same" checked><label for="bill-same"><span class="choice__mark" aria-hidden="true"></span><span class="choice__title">Same as shipping address</span></label></div>
+                <div class="choice choice--simple"><input type="radio" name="billing" id="bill-diff" value="different"><label for="bill-diff"><span class="choice__mark" aria-hidden="true"></span><span class="choice__title">Use a different billing address</span></label></div>
+              </div>
+              <div class="billing" data-billing-fields hidden>
+                <div class="field">
+                  <label class="field__label" for="bill-name">Full name</label>
+                  <input class="field__input" id="bill-name" name="billName" type="text" autocomplete="billing name">
+                </div>
+                <div class="fields fields--2">
+                  <div class="field">
+                    <label class="field__label" for="bill-country">Country</label>
+                    <input class="field__input" id="bill-country" name="billCountry" type="text" autocomplete="billing country-name" value="Lebanon">
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="bill-city">City / area</label>
+                    <input class="field__input" id="bill-city" name="billCity" type="text" autocomplete="billing address-level2">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="bill-address">Full address</label>
+                  <textarea class="field__input" id="bill-address" name="billAddress" rows="3" autocomplete="billing street-address" placeholder="Street, building, floor and a nearby landmark"></textarea>
+                </div>
+              </div>
             </fieldset>
 
             <div class="co__submit" data-fab-avoid>
@@ -298,6 +327,6 @@
   <script src="assets/vendor/ScrollTrigger.min.js?v=3.12.5" defer></script>
   <script src="assets/vendor/lenis.min.js?v=1.1.13" defer></script>
   <script src="assets/js/content.js?v=32404138" defer></script>
-  <script src="assets/js/site.js?v=4748c517" defer></script>
+  <script src="assets/js/site.js?v=a60de383" defer></script>
 </body>
 </html>
