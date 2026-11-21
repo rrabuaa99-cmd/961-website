@@ -3,7 +3,7 @@
 
 export const PRODUCTS = {
   hoodie: { name: '+961 Hoodie', colour: 'Black', cents: 1900 },
-  tshirt: { name: '+961 T-Shirt', colour: 'White', cents: 1500 }
+  tshirt: { name: '+961 T-Shirt', colour: 'White', cents: 1300 }
 };
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 export const DELIVERY_LEBANON_CENTS = 400; // PLACEHOLDER: keep equal to deliveryLebanon in assets/js/site.js

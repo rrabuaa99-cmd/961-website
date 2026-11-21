@@ -35,7 +35,7 @@
       ]
     },
     tshirt: {
-      id: 'tshirt', name: '+961 T-Shirt', colour: 'White', waName: 'White T-Shirt', price: 15,
+      id: 'tshirt', name: '+961 T-Shirt', colour: 'White', waName: 'White T-Shirt', price: 13,
       url: 't-shirt.html', tile: 'dark', thumb: 'assets/img/tshirt-front-600.webp',
       views: [
         { src: 'assets/img/tshirt-front-1000.webp', alt: '+961 T-Shirt in white, front view with a small black +961 print on the chest' },
