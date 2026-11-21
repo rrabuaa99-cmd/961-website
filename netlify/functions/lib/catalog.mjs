@@ -2,7 +2,7 @@
 // If you change a price or the delivery fee, change it here and in assets/js/site.js.
 
 export const PRODUCTS = {
-  hoodie: { name: '+961 Hoodie', colour: 'Black', cents: 2100 },
+  hoodie: { name: '+961 Hoodie', colour: 'Black', cents: 1900 },
   tshirt: { name: '+961 T-Shirt', colour: 'White', cents: 1500 }
 };
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];

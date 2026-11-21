@@ -27,7 +27,7 @@
 
   var PRODUCTS = {
     hoodie: {
-      id: 'hoodie', name: '+961 Hoodie', colour: 'Black', waName: 'Black Hoodie', price: 21,
+      id: 'hoodie', name: '+961 Hoodie', colour: 'Black', waName: 'Black Hoodie', price: 19,
       url: 'hoodie.html', tile: 'light', thumb: 'assets/img/hoodie-front-600.webp',
       views: [
         { src: 'assets/img/hoodie-front-1000.webp', alt: '+961 Hoodie in black, front view with a small white +961 print on the chest' },
