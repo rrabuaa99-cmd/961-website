@@ -847,13 +847,16 @@
       if (o.email) body._replyto = o.email;                      // press Reply to answer the customer
       return fetch(orderEndpoint(), {
         method: 'POST',
-        keepalive: true,
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(body),
         signal: ctrl ? ctrl.signal : undefined
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
-          if (!r.ok || !(j.success === true || j.success === 'true')) throw new Error(j.message || 'HTTP ' + r.status);
+          if (!r.ok || !(j.success === true || j.success === 'true')) {
+            var err = new Error(j.message || 'HTTP ' + r.status);
+            err.needsActivation = /activat/i.test(j.message || '');
+            throw err;
+          }
         });
       }).then(function () { clearTimeout(timer); }, function (err) { clearTimeout(timer); throw err; });
     }
@@ -885,9 +888,11 @@
       if (EMBEDDED) { showConfirmation(o, kind, { preview: true }); return; }
       if (!CONFIG.orderEmail) { showNotice('Online orders are not switched on yet. Send this order on WhatsApp and we will confirm it there.', o); return; }
       setSending(true);
-      sendOrder(o, statusFor(o)).then(function () { showConfirmation(o, kind); }, function () {
+      sendOrder(o, statusFor(o)).then(function () { showConfirmation(o, kind); }, function (err) {
         setSending(false);
-        showNotice('We could not send your order. Check your connection and try again, or send it on WhatsApp instead.', o);
+        showNotice(err && err.needsActivation
+          ? 'Online orders are being switched on and this order was not sent. Please send it on WhatsApp instead.'
+          : 'We could not send your order. Check your connection and try again, or send it on WhatsApp instead.', o);
       });
     }, sig);
 
