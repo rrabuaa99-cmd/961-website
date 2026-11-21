@@ -845,10 +845,13 @@
         'Payment': status
       };
       if (o.email) body.replyto = o.email;                       // press Reply to answer the customer
+      // Sent as a plain form, so browsers send it straight away without an extra check
+      var data = new FormData();
+      Object.keys(body).forEach(function (k) { data.append(k, body[k] === false ? '' : String(body[k])); });
       return fetch(ORDER_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(body),
+        headers: { Accept: 'application/json' },
+        body: data,
         signal: ctrl ? ctrl.signal : undefined
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
