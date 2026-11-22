@@ -127,6 +127,12 @@
       this.items = Array.isArray(v) ? v.filter(function (i) {
         return i && PRODUCTS[i.id] && SIZES.indexOf(i.size) > -1 && i.qty > 0;
       }).map(function (i) { return { id: i.id, colour: validColour(i.id, i.colour), size: i.size, qty: Math.min(99, Math.max(1, i.qty | 0)) }; }) : [];
+      var merged = [];
+      this.items.forEach(function (i) {
+        var same = merged.filter(function (m) { return m.id === i.id && m.colour === i.colour && m.size === i.size; })[0];
+        if (same) same.qty = Math.min(99, same.qty + i.qty); else merged.push(i);
+      });
+      this.items = merged;
     },
     save: function () { store.set('961-cart', JSON.stringify(this.items)); renderCart(); },
     find: function (id, colour, size) { return this.items.filter(function (i) { return i.id === id && i.colour === colour && i.size === size; })[0]; },
@@ -1303,7 +1309,7 @@
         route: t.getAttribute('data-route'), template: t.getAttribute('data-template') || ''
       });
     }
-    return fetch(r.url.split('#')[0], { credentials: 'same-origin' }).then(function (res) {
+    return fetch(r.url.split('#')[0], { credentials: 'same-origin', cache: 'no-cache' }).then(function (res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.text();
     }).then(function (html) {
@@ -1346,6 +1352,7 @@
 
   function navigate(r, push) {
     if (busy) return;
+    if (outdated && !EMBEDDED) { store.set('961-reloaded', newest, true); location.href = r.url; return; }
     busy = true;
     Promise.all([getPage(r), curtainIn()]).then(function (res) {
       swapMain(res[0], r);
@@ -1409,24 +1416,42 @@
     }
   });
 
+  /* ------------------------------------------------------------------ always the newest version */
+  // Browsers keep a saved copy of each page for a while. When a newer version of the site
+  // has been published, the page reloads itself once (or, if the visitor is typing at
+  // checkout, the next page change loads the new version instead).
+  var BUILD = root.getAttribute('data-build');
+  var outdated = false, newest = '', lastCheck = 0;
+  function typing() {
+    return $$('#main input, #main textarea, #main select').some(function (f) {
+      return (f.type === 'radio' || f.type === 'checkbox') ? false : !!f.value && f.defaultValue !== f.value;
+    });
+  }
+  function checkVersion() {
+    if (EMBEDDED || !BUILD || !window.fetch || Date.now() - lastCheck < 30000) return;
+    lastCheck = Date.now();
+    fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (res) { return res.ok ? res.json() : null; }).then(function (j) {
+      if (!j || !j.v || j.v === BUILD) return;
+      outdated = true; newest = j.v;
+      if (store.get('961-reloaded', true) === j.v || typing() || busy) return;
+      store.set('961-reloaded', j.v, true);
+      location.reload();
+    }).catch(function () { /* offline: keep the page as it is */ });
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) { lastCheck = 0; checkVersion(); } });
+  doc.addEventListener('visibilitychange', function () { if (doc.visibilityState === 'visible') checkVersion(); });
+
   /* ------------------------------------------------------------------ boot */
   function boot() {
     renderCart();
-    if (EMBEDDED) {
-      var key = location.hash.slice(1);
-      var route = key === 'home' ? 'index' : key;
-      if (key && ROUTES.indexOf(route) > -1 && route !== current) {
-        var t = templates[route];
-        mainEl.innerHTML = t.innerHTML;
-        mainEl.setAttribute('data-route', route);
-        mainEl.setAttribute('data-template', t.getAttribute('data-template') || '');
-        doc.title = t.getAttribute('data-title');
-        current = route;
-      }
+    if (EMBEDDED && location.hash) {
+      // The preview always opens on the home page, never on the last page visited.
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ }
     }
     setRouteAttrs();
     initPage();
     if (root.classList.contains('has-intro')) store.set('961-intro', '1');
+    checkVersion();
     if (root.classList.contains('is-entering')) curtainOut();
     if (location.hash && !EMBEDDED) {
       var target = doc.getElementById(location.hash.slice(1));
