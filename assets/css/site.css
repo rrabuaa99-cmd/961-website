@@ -1130,3 +1130,65 @@ html.has-bag .co__empty { display: none; }
 .colour-opt .swatch { width: 20px; height: 20px; }
 [data-theme="dark"] .swatch--black { border-color: var(--line-strong); }
 .pdp__slide img { transition: opacity var(--t-fast) var(--ease); }
+
+/* ==========================================================================
+   Motion, round 2
+   ========================================================================== */
+
+/* ---------- moving band of text on the home page ---------- */
+.ticker { position: relative; overflow: hidden; padding-block: clamp(20px, 3.2vw, 40px); border-bottom: 1px solid var(--line); }
+.ticker__viewport { overflow: hidden; }
+.ticker__track { display: flex; width: max-content; will-change: transform; }
+.ticker__set { display: flex; align-items: center; flex-shrink: 0; }
+.ticker__item { font-family: var(--serif); font-size: clamp(30px, 4.6vw, 68px); line-height: 1.15; font-weight: 400; font-variant-numeric: lining-nums; white-space: nowrap; padding-inline: clamp(16px, 2.2vw, 36px); }
+.ticker__item:nth-child(4n + 3) { font-style: italic; }
+.ticker__sep { flex-shrink: 0; width: clamp(28px, 3.4vw, 56px); height: 1px; background: var(--line-strong); }
+
+/* ---------- buttons: the label rolls out the top and back in from below ---------- */
+@keyframes btn-roll {
+  0% { transform: none; animation-timing-function: cubic-bezier(.55, 0, .8, .2); }
+  42% { transform: translateY(-170%); }
+  42.01% { transform: translateY(170%); animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+  100% { transform: none; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:not(.is-done):not(:disabled):hover .btn__label { animation: btn-roll 720ms both; }
+}
+
+/* ---------- cursor: a filled circle with a word over photos ---------- */
+.cursor__label { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%) scale(.4); opacity: 0; font-family: var(--sans); font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; line-height: 1; white-space: nowrap; color: var(--white); transition: transform var(--t-base) var(--ease), opacity var(--t-fast) var(--ease); }
+.cursor[data-on="dark"] .cursor__label { color: var(--black); }
+.cursor.has-label .cursor__ring { transform: scale(1.9); opacity: 1; background: currentColor; }
+.cursor.has-label .cursor__dot { opacity: 0; }
+.cursor.has-label .cursor__label { opacity: 1; transform: translate(-50%, -50%); }
+.has-cursor [data-cursor], .has-cursor [data-cursor] * { cursor: none; }
+
+/* ---------- page change: page name under the logo ---------- */
+.curtain__label { position: absolute; left: 0; right: 0; top: calc(50% + 40px); text-align: center; font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; line-height: 1; color: var(--gray-500); opacity: 0; }
+
+/* ---------- header slides away while scrolling down, back when scrolling up ---------- */
+.header.is-tucked .header__inner { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px) - 8px)); }
+.header.is-tucked .header__bg { transform: translateY(-100%); }
+
+/* ---------- large +961: each character moves on its own ---------- */
+.st-ch { display: inline-block; will-change: transform; }
+
+/* ---------- bag: photo flying into the bag, and the number rolling ---------- */
+.fly { position: fixed; z-index: 95; pointer-events: none; object-fit: cover; border-radius: var(--radius); transform-origin: 50% 50%; will-change: transform, opacity; }
+.cart-btn__count { overflow: hidden; }
+.cart-btn__count span { display: block; }
+
+/* ---------- touch screens: product photos press in slightly when tapped ---------- */
+@media (hover: none) {
+  .card__media, .ig__tile { transition: transform 400ms var(--ease); }
+  .card__link:active .card__media, .ig__tile:active { transform: scale(.975); }
+}
+
+/* ---------- footer +961 rises in ---------- */
+.footer__logo { display: inline-flex; }
+
+/* ---------- very narrow phones (folded Galaxy Fold, 280px): buttons wrap instead of spilling off screen ---------- */
+@media (max-width: 359px) {
+  .btn { max-width: 100%; white-space: normal; text-align: center; padding-inline: var(--s2); letter-spacing: .06em; line-height: 1.25; }
+  .btn__label { flex-wrap: wrap; justify-content: center; row-gap: 4px; }
+}
