@@ -42,11 +42,7 @@
         white: { label: 'White', img: 'tshirt', tile: 'dark',
           alt: ['+961 T-Shirt in white, front view with a small black +961 print on the chest', '+961 T-Shirt in white, back view with a large black +961 print across the back'],
           desc: 'A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.',
-          print: '+961 printed in black on the chest and across the back' },
-        black: { label: 'Black', img: 'tshirt-black', tile: 'light',
-          alt: ['+961 T-Shirt in black, front view with a small white +961 print on the chest', '+961 T-Shirt in black, back view, plain'],
-          desc: 'A black t-shirt with +961 printed small in white on the chest and a clean back. Crew neck, short sleeves, an easy everyday fit.',
-          print: '+961 printed in white on the chest, plain back' }
+          print: '+961 printed in black on the chest and across the back' }
       }
     }
   };
@@ -319,7 +315,7 @@
   ];
   var QUIZ_TRAITS = {
     hoodie: { sleeves: 'long', fabric: 'heavy', colour: 'black', season: 'cool', hood: 'yes', pocket: 'yes', place: 'mountain', feel: 'cosy' },
-    tshirt: { sleeves: 'short', fabric: 'light', colour: ['white', 'black'], season: 'warm', hood: 'no', pocket: 'no', place: 'coast', feel: 'light' }
+    tshirt: { sleeves: 'short', fabric: 'light', colour: 'white', season: 'warm', hood: 'no', pocket: 'no', place: 'coast', feel: 'light' }
   };
   var quizEl = $('#quiz'), quizBody = quizEl ? $('[data-quiz-body]', quizEl) : null, quiz = null, lastQuizSet = '';
   function shuffle(list) {

@@ -6,7 +6,7 @@ export const PRODUCTS = {
   tshirt: { name: '+961 T-Shirt', colour: 'White', cents: 1300 }
 };
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
-export const COLOURS = { hoodie: { black: 'Black' }, tshirt: { white: 'White', black: 'Black' } };
+export const COLOURS = { hoodie: { black: 'Black' }, tshirt: { white: 'White' } };
 export const DELIVERY_LEBANON_CENTS = 400; // PLACEHOLDER: keep equal to deliveryLebanon in assets/js/site.js
 
 export function cleanItems(raw) {
