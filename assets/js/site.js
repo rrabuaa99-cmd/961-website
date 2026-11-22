@@ -538,7 +538,7 @@
       tl.from(lines, { yPercent: 105, duration: 0.8, ease: EASE, stagger: 0.1 }, 0.1);
       if (frame) tl.add(maskTween(frame), 0);
       tl.from($$('[data-hero-fade]', hero), { y: 24, opacity: 0, duration: 0.7, ease: EASE, stagger: 0.08 }, 0.35);
-      if (heroImg) G.fromTo(heroImg, { yPercent: 0, scale: 1 }, { yPercent: 10, scale: 1.08, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+      if (heroImg) G.fromTo(heroImg, { yPercent: -3, scale: 1.1 }, { yPercent: 4, scale: 1.14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
     }
 
     // giant +961 statement

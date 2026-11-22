@@ -1059,3 +1059,20 @@ html.has-bag .co__empty { display: none; }
 .billing { display: grid; gap: var(--s3); }
 .billing:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
 @keyframes billing-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- main photo on the home page ---------- */
+.hero__media { height: auto; max-height: none; align-items: center; }
+.hero__frame { width: 100%; height: auto; aspect-ratio: 1284 / 860; max-width: 100%; }
+.hero__frame .mask__img img { object-fit: cover; }
+@media (max-width: 767px) {
+  /* edge to edge on phones, right under the header */
+  .hero__media { padding-top: 0; margin-left: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(var(--gutter), env(safe-area-inset-right, 0px))); }
+}
+@media (min-width: 1024px) {
+  .hero__text { grid-column: 1 / span 5; }
+  .hero__media { grid-column: 6 / span 7; height: auto; }
+}
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 600px) and (max-width: 1023px) {
+  .hero__text { grid-column: 1 / span 6; }
+  .hero__media { grid-column: 7 / span 6; height: auto; }
+}
