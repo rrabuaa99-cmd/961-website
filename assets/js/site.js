@@ -56,7 +56,7 @@
       id: id, name: p.name, price: p.price, url: p.url, colourKey: key, colour: c.label,
       waName: c.label + ' ' + p.short, tile: c.tile, desc: c.desc, print: c.print,
       thumb: img('front', 600), img: img,
-      views: [{ src: img('front', 1000), src600: img('front', 600), alt: c.alt[0] }, { src: img('back', 1000), src600: img('back', 600), alt: c.alt[1] }]
+      views: [{ src: img('front', 1000), src600: img('front', 600), src1500: img('front', 1500), alt: c.alt[0] }, { src: img('back', 1000), src600: img('back', 600), src1500: img('back', 1500), alt: c.alt[1] }]
     };
   }
   var SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -224,7 +224,6 @@
   function flyToBag(from) {
     var target = $('.header .cart-btn');
     if (!G || !target) { bounceCart(); return; }
-    showHeader(1600);
     var img = null, best = 0, vw = window.innerWidth, vh = window.innerHeight;
     $$('.pdp__slide img', mainEl).forEach(function (im) {
       var r = im.getBoundingClientRect();
@@ -464,6 +463,15 @@
 
   // lightbox
   var lb = $('#lightbox'), lbState = { p: null, i: 0 };
+  // Zoom shows the photo already on the page at once, then the sharpest version when it has loaded.
+  function lbSet(img, v) {
+    img.alt = v.alt;
+    img.src = v.src;
+    img.setAttribute('data-want', v.src1500);
+    var hi = new Image();
+    hi.onload = function () { if (img.getAttribute('data-want') === v.src1500) img.src = v.src1500; };
+    hi.src = v.src1500;
+  }
   function lbShow(i) {
     var v = lbState.p.views;
     lbState.i = (i + v.length) % v.length;
@@ -471,8 +479,7 @@
     $('.lightbox__stage', lb).classList.remove('is-zoomed');
     img.style.opacity = '0';
     setTimeout(function () {
-      img.src = v[lbState.i].src;
-      img.alt = v[lbState.i].alt;
+      lbSet(img, v[lbState.i]);
       img.style.opacity = '1';
     }, reduce ? 0 : 150);
     $('.lightbox__count', lb).textContent = (lbState.i + 1) + ' / ' + v.length;
@@ -482,7 +489,7 @@
     lbState.p = p;
     lb.dataset.theme = p.tile;
     var img = $('.lightbox__img', lb);
-    img.src = p.views[i].src; img.alt = p.views[i].alt; lbState.i = i;
+    lbSet(img, p.views[i]); lbState.i = i;
     $('.lightbox__count', lb).textContent = (i + 1) + ' / ' + p.views.length;
     $('.lightbox__stage', lb).classList.remove('is-zoomed');
     openLayer(lb, { focus: $('[data-lb-close]', lb) });
@@ -524,8 +531,7 @@
 
   /* ------------------------------------------------------------------ header, progress, floating button */
   var header = $('#header'), progressBar = $('.progress span'), fab = $('.fab');
-  var themed = [], ticking = false, lastY = 0, tuckRun = 0, tuckHold = 0;
-  function showHeader(ms) { if (header) header.classList.remove('is-tucked'); tuckRun = 0; tuckHold = Date.now() + (ms || 0); }
+  var themed = [], ticking = false;
   function collectThemed() { themed = $$('main > [data-theme], main > * > [data-theme].section, .footer'); avoidEls = $$('[data-fab-avoid]'); }
   function updateChrome() {
     ticking = false;
@@ -533,12 +539,6 @@
     var vh = window.innerHeight;
     if (header) {
       header.classList.toggle('is-scrolled', y > 24);
-      var dy = y - lastY; lastY = y;
-      tuckRun = (dy > 0) === (tuckRun > 0) ? tuckRun + dy : dy;
-      var canTuck = !reduce && y > Math.max(320, vh * 0.6) && !layers.length && !root.classList.contains('menu-open') && !header.contains(doc.activeElement) && Date.now() > tuckHold;
-      if (!canTuck) header.classList.remove('is-tucked');
-      else if (tuckRun > 40) header.classList.add('is-tucked');
-      else if (tuckRun < -16) header.classList.remove('is-tucked');
       var theme = 'light';
       if (root.classList.contains('menu-open')) theme = 'dark';
       else {
@@ -918,7 +918,7 @@
         slide.classList.add('tile--' + p.tile);
         var swap = function () {
           img.src = v.src;
-          img.srcset = v.src600 + ' 600w, ' + v.src + ' 1000w';
+          img.srcset = v.src600 + ' 600w, ' + v.src + ' 1000w, ' + v.src1500 + ' 1500w';
           img.alt = v.alt;
           img.style.opacity = '';
         };
@@ -1518,6 +1518,7 @@
 
   function setRouteAttrs() {
     root.setAttribute('data-page', current);
+    syncBack();
     root.setAttribute('data-template', mainEl.getAttribute('data-template') || '');
     $$('[data-nav]').forEach(function (a) {
       var on = a.getAttribute('data-nav') === current || (current === 'hoodie' || current === 't-shirt') && a.getAttribute('data-nav') === 'shop';
@@ -1528,22 +1529,49 @@
   function navigate(r, push) {
     if (busy) return;
     if (curtainLabel) curtainLabel.textContent = ROUTE_NAMES[r.route] || '';
-    if (outdated && !EMBEDDED) { store.set('961-reloaded', newest, true); location.href = r.url; return; }
+    if (outdated && !EMBEDDED) { store.set('961-reloaded', newest, true); if (push === 'replace') location.replace(r.url); else location.href = r.url; return; }
     busy = true;
     Promise.all([getPage(r), curtainIn()]).then(function (res) {
       swapMain(res[0], r);
-      if (push && !EMBEDDED) { try { history.pushState({ route: r.route }, '', r.url); } catch (e) { /* ignore */ } }
+      if (push === 'replace' && !EMBEDDED) { try { history.replaceState({ route: r.route, depth: navDepth }, '', r.url); } catch (e) { /* ignore */ } }
+      else if (push && !EMBEDDED) { try { history.pushState({ route: r.route, depth: navDepth + 1 }, '', r.url); navDepth += 1; } catch (e) { /* ignore */ } }
       return curtainOut();
     }).then(function () { busy = false; }).catch(function () {
       busy = false;
-      if (!EMBEDDED) { store.set('961-nav', '1', true); location.href = r.url; }
+      if (!EMBEDDED) { store.set('961-nav', '1', true); if (push === 'replace') location.replace(r.url); else location.href = r.url; }
       else curtainOut();
     });
   }
 
-  function go(r) {
+  // Back button: returns to the previous page on this site. With no earlier page here
+  // (opened from Instagram, a message or a bookmark), it goes one level up instead:
+  // product to Shop, Shop and the other pages to Home.
+  var BACK_TO = { shop: 'index.html', hoodie: 'shop.html', 't-shirt': 'shop.html', checkout: 'shop.html', about: 'index.html', 'size-guide': 'index.html', faq: 'index.html', '404': 'index.html' };
+  var navDepth = 0;          // pages back inside this site, in the browser history
+  var trail = [];            // preview only: pages visited, newest last
+  function goBack() {
+    closeAll();
+    if (EMBEDDED) {
+      var prev = trail.pop();
+      go(parseHref(prev || BACK_TO[current] || 'index.html'), true);
+      return;
+    }
+    if (navDepth > 0) { try { history.back(); return; } catch (e) { /* fall through */ } }
+    // one level up, replacing this step, so pressing Back again keeps moving toward Home
+    var up = parseHref(BACK_TO[current] || 'index.html');
+    if (up && up.route !== current) navigate(up, 'replace');
+  }
+  function syncBack() {
+    $$('[data-back]').forEach(function (b) {
+      b.hidden = current === 'index';
+      b.setAttribute('href', BACK_TO[current] || 'index.html');
+    });
+  }
+
+  function go(r, isBack) {
     if (!r) return;
     closeAll();
+    if (EMBEDDED && !isBack && r.route !== current) { trail.push(current === 'index' ? 'index.html' : current + '.html'); if (trail.length > 40) trail.shift(); }
     if (r.route === current) {
       var t = r.hash && doc.getElementById(r.hash);
       if (t) scrollToEl(t); else scrollToY(0);
@@ -1561,6 +1589,7 @@
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest('a[href]');
     if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+    if (a.hasAttribute('data-back')) { e.preventDefault(); goBack(); return; }
     var href = a.getAttribute('href');
     if (!href || href.charAt(0) === '#' || /^(mailto|tel|sms):/i.test(href)) return;
     var r = parseHref(a.href);
@@ -1578,8 +1607,17 @@
       if (route !== current) { closeAll(); navigate({ route: route, hash: '', url: route + '.html' }, false); }
     });
   } else {
-    try { history.replaceState({ route: current }, ''); } catch (e) { /* ignore */ }
-    window.addEventListener('popstate', function () {
+    var st = history.state;
+    if (st && typeof st.depth === 'number') navDepth = st.depth;
+    else {
+      // arrived from another page of this site with a full page load
+      var ref = null;
+      try { ref = doc.referrer ? new URL(doc.referrer) : null; } catch (e) { ref = null; }
+      navDepth = ref && ref.origin === location.origin && parseHref(ref.href) && history.length > 1 && ref.href !== location.href ? 1 : 0;
+    }
+    try { history.replaceState({ route: current, depth: navDepth }, ''); } catch (e) { /* ignore */ }
+    window.addEventListener('popstate', function (e) {
+      navDepth = e.state && typeof e.state.depth === 'number' ? e.state.depth : 0;
       var r = parseHref(location.href);
       if (r && r.route !== current) { closeAll(); navigate(r, false); }
     });

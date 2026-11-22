@@ -1166,9 +1166,6 @@ html.has-bag .co__empty { display: none; }
 /* ---------- page change: page name under the logo ---------- */
 .curtain__label { position: absolute; left: 0; right: 0; top: calc(50% + 40px); text-align: center; font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; line-height: 1; color: var(--gray-500); opacity: 0; }
 
-/* ---------- header slides away while scrolling down, back when scrolling up ---------- */
-.header.is-tucked .header__inner { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px) - 8px)); }
-.header.is-tucked .header__bg { transform: translateY(-100%); }
 
 /* ---------- large +961: each character moves on its own ---------- */
 .st-ch { display: inline-block; will-change: transform; }
@@ -1191,4 +1188,16 @@ html.has-bag .co__empty { display: none; }
 @media (max-width: 359px) {
   .btn { max-width: 100%; white-space: normal; text-align: center; padding-inline: var(--s2); letter-spacing: .06em; line-height: 1.25; }
   .btn__label { flex-wrap: wrap; justify-content: center; row-gap: 4px; }
+}
+
+/* ---------- back button: every page except the home page ---------- */
+.back-btn { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 48px; padding: 0 8px 0 4px; font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; line-height: 1; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: transform var(--t-fast) var(--ease); }
+.back-btn .icon { width: 22px; height: 22px; flex-shrink: 0; transition: transform var(--t-base) var(--ease); }
+.back-btn:active { transform: scale(.94); }
+@media (hover: hover) { .back-btn:hover .icon { transform: translateX(-4px); } }
+.back-btn:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+@media (max-width: 369px) { .back-btn__label { display: none; } .back-btn { width: 44px; justify-content: center; padding: 0; } }
+@media (min-width: 1024px) {
+  .back-btn { margin: 0 var(--s4) 0 -4px; }
+  .back-btn::after { content: ""; position: absolute; right: calc(var(--s4) / -2); top: 50%; width: 1px; height: 16px; margin-top: -8px; background: currentColor; opacity: .25; }
 }
