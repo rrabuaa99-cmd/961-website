@@ -283,6 +283,114 @@
     $$('a', sizeModal).forEach(function (a) { a.addEventListener('click', function () { closeLayer(sizeModal); }); });
   }
 
+  /* ------------------------------------------------------------------ style quiz
+     Four questions picked at random from the list below. Each answer is a trait;
+     the products whose traits match the most answers are recommended.
+     To add a product to the quiz, give it the same traits in QUIZ_TRAITS. */
+  var QUIZ_QUESTIONS = [
+    { key: 'sleeves', q: 'Long sleeves or short sleeves?', a: [['long', 'Long sleeves', 'Covered arms, whatever the weather'], ['short', 'Short sleeves', 'Light and easy']] },
+    { key: 'fabric', q: 'Heavy fabric or light fabric?', a: [['heavy', 'Heavy fabric', 'Thick, soft and warm'], ['light', 'Light fabric', 'Breathable on hot days']] },
+    { key: 'colour', q: 'Black or white?', a: [['black', 'Black', 'Bold, with a white print'], ['white', 'White', 'Clean, with a black print']] },
+    { key: 'season', q: 'When will you wear it most?', a: [['cool', 'Cool evenings', 'Autumn and winter nights'], ['warm', 'Warm days', 'Spring and summer']] },
+    { key: 'hood', q: 'Hood or no hood?', a: [['yes', 'With a hood', 'For wind, rain or quiet days'], ['no', 'No hood', 'A clean neckline']] },
+    { key: 'pocket', q: 'Front pocket or clean front?', a: [['yes', 'Front pocket', 'Somewhere for your hands and phone'], ['no', 'Clean front', 'Nothing but the print']] },
+    { key: 'place', q: 'Pick your weekend.', a: [['mountain', 'A winter night in Faraya', 'Cold air, warm layers'], ['coast', 'A summer day in Batroun', 'Sun, sea and a light tee']] },
+    { key: 'feel', q: 'How do you like it to feel?', a: [['cosy', 'Soft and cosy', 'Something to live in'], ['light', 'Light and simple', 'Throw it on and go']] }
+  ];
+  var QUIZ_TRAITS = {
+    hoodie: { sleeves: 'long', fabric: 'heavy', colour: 'black', season: 'cool', hood: 'yes', pocket: 'yes', place: 'mountain', feel: 'cosy' },
+    tshirt: { sleeves: 'short', fabric: 'light', colour: 'white', season: 'warm', hood: 'no', pocket: 'no', place: 'coast', feel: 'light' }
+  };
+  var quizEl = $('#quiz'), quizBody = quizEl ? $('[data-quiz-body]', quizEl) : null, quiz = null, lastQuizSet = '';
+  function shuffle(list) {
+    var a = list.slice();
+    for (var n = a.length - 1; n > 0; n--) { var j = Math.floor(Math.random() * (n + 1)); var t = a[n]; a[n] = a[j]; a[j] = t; }
+    return a;
+  }
+  function newQuiz() {
+    var set, sig;
+    do { set = shuffle(QUIZ_QUESTIONS).slice(0, 4); sig = set.map(function (q) { return q.key; }).sort().join(); }
+    while (sig === lastQuizSet && QUIZ_QUESTIONS.length > 4);
+    lastQuizSet = sig;
+    quiz = { qs: set.map(function (q) { return { key: q.key, q: q.q, a: shuffle(q.a) }; }), step: 0, answers: [] };
+  }
+  function showQuizView(html, back) {
+    quizBody.innerHTML = html;
+    var view = quizBody.firstElementChild;
+    if (back) view.classList.add('is-back');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { view.classList.add('is-in'); }); });
+    var h = $('h2', view); if (h) h.focus({ preventScroll: true });
+  }
+  function renderQuizStep(back) {
+    var q = quiz.qs[quiz.step], n = quiz.qs.length;
+    var picked = quiz.answers[quiz.step];
+    showQuizView(
+      '<div class="quiz__step">' +
+        '<div class="quiz__progress"><span>Question ' + (quiz.step + 1) + ' of ' + n + '</span><span class="quiz__bar" aria-hidden="true"><i style="transform:scaleX(' + ((quiz.step + 1) / n) + ')"></i></span></div>' +
+        '<h2 class="quiz__q" tabindex="-1">' + esc(q.q) + '</h2>' +
+        '<div class="quiz__opts">' + q.a.map(function (o, k) {
+          return '<button class="quiz__opt' + (picked && picked.value === o[0] ? ' is-picked' : '') + '" type="button" data-answer="' + k + '"><span class="quiz__opt-title">' + esc(o[1]) + '</span><span class="quiz__opt-text">' + esc(o[2]) + '</span></button>';
+        }).join('') + '</div>' +
+        (quiz.step > 0 ? '<button class="quiz__back text-link small" type="button" data-quiz-back>Back</button>' : '') +
+      '</div>', back);
+  }
+  function quizCard(p) {
+    return '<a class="quiz__card" href="' + p.url + '">' +
+      '<span class="quiz__card-media tile--' + p.tile + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + '" width="600" height="750" decoding="async"></span>' +
+      '<span class="quiz__card-info"><span class="quiz__card-name">' + esc(p.name) + '</span><span class="quiz__card-price">' + money(p.price) + '</span><span class="small muted">' + p.colour + ' / S to XXL</span><span class="quiz__card-cta">View ' + esc(p.name.replace('+961 ', 'the ').toLowerCase().replace('the ', 'the ')) + ' →</span></span>' +
+    '</a>';
+  }
+  function renderQuizResult() {
+    var scores = Object.keys(QUIZ_TRAITS).filter(function (id) { return PRODUCTS[id]; }).map(function (id) {
+      var traits = QUIZ_TRAITS[id];
+      var matched = quiz.answers.filter(function (a) { return traits[a.key] === a.value; });
+      return { id: id, score: matched.length, matched: matched };
+    }).sort(function (x, y) { return y.score - x.score; });
+    var best = scores[0].score;
+    var winners = scores.filter(function (s) { return s.score === best; });
+    var tie = winners.length > 1;
+    var title = tie ? 'You are a 50/50.' : 'Your match: ' + PRODUCTS[winners[0].id].name + '.';
+    var text = tie
+      ? 'Your answers fit both pieces equally. Start with either, or wear one of each.'
+      : 'It matches ' + best + ' of your ' + quiz.answers.length + ' answers: ' + winners[0].matched.map(function (a) { return a.label.charAt(0).toLowerCase() + a.label.slice(1); }).join(', ') + '.';
+    showQuizView(
+      '<div class="quiz__result">' +
+        '<p class="quiz__progress"><span>Your result</span></p>' +
+        '<h2 class="quiz__q" tabindex="-1">' + esc(title) + '</h2>' +
+        '<p class="small muted">' + esc(text) + '</p>' +
+        '<div class="quiz__cards' + (tie ? ' is-pair' : '') + '">' + winners.map(function (w) { return quizCard(PRODUCTS[w.id]); }).join('') + '</div>' +
+        '<button class="quiz__back text-link small" type="button" data-quiz-restart>Take the quiz again (new questions)</button>' +
+      '</div>');
+  }
+  if (quizEl) {
+    doc.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-open-quiz]');
+      if (!t) return;
+      newQuiz();
+      renderQuizStep();
+      openLayer(quizEl, { focus: $('.quiz__q', quizBody) });
+    });
+    $$('[data-quiz-close]', quizEl).forEach(function (b) { b.addEventListener('click', function () { closeLayer(quizEl); }); });
+    quizBody.addEventListener('click', function (e) {
+      var opt = e.target.closest('[data-answer]');
+      if (opt && quiz && !quiz.busy) {
+        var q = quiz.qs[quiz.step], o = q.a[parseInt(opt.getAttribute('data-answer'), 10)];
+        quiz.answers[quiz.step] = { key: q.key, value: o[0], label: o[1] };
+        $$('.quiz__opt', quizBody).forEach(function (b) { b.classList.toggle('is-picked', b === opt); });
+        quiz.busy = true;
+        setTimeout(function () {
+          quiz.busy = false;
+          quiz.step++;
+          if (quiz.step < quiz.qs.length) renderQuizStep(); else renderQuizResult();
+        }, reduce ? 0 : 260);
+        return;
+      }
+      if (e.target.closest('[data-quiz-back]') && quiz && quiz.step > 0) { quiz.step--; renderQuizStep(true); return; }
+      if (e.target.closest('[data-quiz-restart]')) { newQuiz(); renderQuizStep(); return; }
+      if (e.target.closest('.quiz__card')) closeLayer(quizEl);
+    });
+  }
+
   // lightbox
   var lb = $('#lightbox'), lbState = { p: null, i: 0 };
   function lbShow(i) {
