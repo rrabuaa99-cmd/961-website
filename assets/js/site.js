@@ -52,11 +52,12 @@
   function pv(id, colour) {
     var p = PRODUCTS[id], key = validColour(id, colour), c = p.colours[key];
     var img = function (view, w) { return 'assets/img/' + c.img + '-' + view + '-' + w + '.webp'; };
+    var set = function (view) { return [400, 600, 800, 1000, 1200, 1500].map(function (w) { return img(view, w) + ' ' + w + 'w'; }).join(', '); };
     return {
       id: id, name: p.name, price: p.price, url: p.url, colourKey: key, colour: c.label,
       waName: c.label + ' ' + p.short, tile: c.tile, desc: c.desc, print: c.print,
-      thumb: img('front', 600), img: img,
-      views: [{ src: img('front', 1000), src600: img('front', 600), src1500: img('front', 1500), alt: c.alt[0] }, { src: img('back', 1000), src600: img('back', 600), src1500: img('back', 1500), alt: c.alt[1] }]
+      thumb: img('front', 400), thumb600: img('front', 600), img: img,
+      views: [{ src: img('front', 1000), set: set('front'), src1500: img('front', 1500), alt: c.alt[0] }, { src: img('back', 1000), set: set('back'), src1500: img('back', 1500), alt: c.alt[1] }]
     };
   }
   var SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -404,7 +405,7 @@
   }
   function quizCard(p) {
     return '<a class="quiz__card" href="' + p.url + (p.colourKey !== colourKeys(p.id)[0] ? '?colour=' + p.colourKey : '') + '">' +
-      '<span class="quiz__card-media tile--' + p.tile + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + '" width="600" height="750" decoding="async"></span>' +
+      '<span class="quiz__card-media tile--' + p.tile + '"><img src="' + p.thumb600 + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + '" width="600" height="750" decoding="async"></span>' +
       '<span class="quiz__card-info"><span class="quiz__card-name">' + esc(p.name) + '</span><span class="quiz__card-price">' + money(p.price) + '</span><span class="small muted">' + p.colour + ' / S to XXL</span><span class="quiz__card-cta">View ' + esc(p.name.replace('+961 ', 'the ').toLowerCase().replace('the ', 'the ')) + ' →</span></span>' +
     '</a>';
   }
@@ -918,7 +919,7 @@
         slide.classList.add('tile--' + p.tile);
         var swap = function () {
           img.src = v.src;
-          img.srcset = v.src600 + ' 600w, ' + v.src + ' 1000w, ' + v.src1500 + ' 1500w';
+          img.srcset = v.set;
           img.alt = v.alt;
           img.style.opacity = '';
         };
