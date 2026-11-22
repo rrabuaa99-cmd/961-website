@@ -6,7 +6,7 @@
 //
 // Prices come from lib/catalog.mjs, on the server, so a visitor cannot change what they pay.
 
-import { cleanItems, PRODUCTS, DELIVERY_LEBANON_CENTS, clean, json } from './lib/catalog.mjs';
+import { cleanItems, PRODUCTS, COLOURS, DELIVERY_LEBANON_CENTS, clean, json } from './lib/catalog.mjs';
 
 const STRIPE_API_VERSION = '2026-11-18.endive';
 
@@ -40,7 +40,7 @@ export default async (req) => {
     params.append(`line_items[${n}][quantity]`, String(item.qty));
     params.append(`line_items[${n}][price_data][currency]`, 'usd');
     params.append(`line_items[${n}][price_data][unit_amount]`, String(p.cents));
-    params.append(`line_items[${n}][price_data][product_data][name]`, `${p.name} (${p.colour}, ${item.size})`);
+    params.append(`line_items[${n}][price_data][product_data][name]`, `${p.name} (${COLOURS[item.id][item.colour]}, ${item.size})`);
   });
   const d = items.length;
   params.append(`line_items[${d}][quantity]`, '1');

@@ -22,7 +22,7 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/eb-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/site.css?v=a166ecec">
+  <link rel="stylesheet" href="assets/css/site.css?v=fe96176f">
   <style>.is-entering .curtain{animation:curtain-safety 0s 2.5s forwards}@keyframes curtain-safety{to{visibility:hidden}}</style>
   <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=JSON.parse(localStorage.getItem('961-cart')||'[]');if(Array.isArray(c)&&c.length){d.classList.add('has-bag');d.style.setProperty('--bag-lines',c.length)}}catch(e){}try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!localStorage.getItem('961-intro'))d.classList.add('has-intro');if(sessionStorage.getItem('961-nav')){sessionStorage.removeItem('961-nav');d.classList.add('is-entering');}}catch(e){}})();</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"+961 T-Shirt","color":"White","brand":{"@type":"Brand","name":"+961"},"description":"A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.","image":["assets/img/tshirt-front-1000.webp","assets/img/tshirt-back-1000.webp"],"offers":{"@type":"Offer","price":"13","priceCurrency":"USD","availability":"https://schema.org/InStock","url":"t-shirt.html"}}</script>
@@ -68,9 +68,14 @@
               <nav class="crumbs" aria-label="Breadcrumb"><a href="shop.html">Shop</a><span aria-hidden="true">/</span><span aria-current="page">T-Shirt</span></nav>
               <h1 class="pdp__name" id="pdp-title">+961 T-Shirt</h1>
               <p class="price pdp__price">$13</p>
-              <p class="pdp__colour"><span class="swatch swatch--white" aria-hidden="true"></span>White</p>
-              <p class="pdp__desc muted">A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.</p>
+              
+              <p class="pdp__desc muted" data-desc>A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.</p>
             </div>
+            <fieldset class="colours" data-reveal>
+              <legend class="sr-only">Choose a colour</legend>
+              <div class="sizes__head"><span class="label" aria-hidden="true">Colour: <span data-colour-name>White</span></span></div>
+              <div class="colours__opts"><div class="colour-opt"><input type="radio" name="colour" id="colour-white" value="white" checked><label for="colour-white"><span class="swatch swatch--white" aria-hidden="true"></span>White</label></div><div class="colour-opt"><input type="radio" name="colour" id="colour-black" value="black"><label for="colour-black"><span class="swatch swatch--black" aria-hidden="true"></span>Black</label></div></div>
+            </fieldset>
             <fieldset class="sizes" data-reveal>
               <legend class="sr-only">Choose a size</legend>
               <div class="sizes__head">
@@ -91,7 +96,7 @@
             <div class="accs" data-reveal>
               <div class="acc">
                 <button class="acc__btn" type="button" aria-expanded="false" aria-controls="acc-d" id="acc-d-btn">Details<span class="acc__icon" aria-hidden="true"></span></button>
-                <div class="acc__panel" id="acc-d" role="region" aria-labelledby="acc-d-btn"><div class="acc__inner"><div class="acc__content"><ul><li>+961 printed in black on the chest and across the back</li><li>Crew neck and short sleeves</li><li><span data-placeholder>100% cotton jersey</span></li><li><span data-placeholder>Machine wash cold, inside out. Do not iron the print.</span></li></ul></div></div></div>
+                <div class="acc__panel" id="acc-d" role="region" aria-labelledby="acc-d-btn"><div class="acc__inner"><div class="acc__content"><ul><li data-print>+961 printed in black on the chest and across the back</li><li>Crew neck and short sleeves</li><li><span data-placeholder>100% cotton jersey</span></li><li><span data-placeholder>Machine wash cold, inside out. Do not iron the print.</span></li></ul></div></div></div>
               </div>
               <div class="acc">
                 <button class="acc__btn" type="button" aria-expanded="false" aria-controls="acc-v" id="acc-v-btn">Delivery<span class="acc__icon" aria-hidden="true"></span></button>
@@ -262,6 +267,6 @@
   <script src="assets/vendor/ScrollTrigger.min.js?v=3.12.5" defer></script>
   <script src="assets/vendor/lenis.min.js?v=1.1.13" defer></script>
   <script src="assets/js/content.js?v=32404138" defer></script>
-  <script src="assets/js/site.js?v=9be4897a" defer></script>
+  <script src="assets/js/site.js?v=2214f6c9" defer></script>
 </body>
 </html>

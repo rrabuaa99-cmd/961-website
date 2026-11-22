@@ -1116,3 +1116,17 @@ html.has-bag .co__empty { display: none; }
 
 /* product tiles hold their own hairline frame */
 .tile--light, .tile--dark { position: relative; }
+
+/* ---------- colour choice on product pages ---------- */
+.colours { display: grid; gap: var(--s2); }
+.colours__opts { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.colour-opt { position: relative; }
+.colour-opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.colour-opt label { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 var(--s2) 0 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; user-select: none; transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), transform var(--t-fast) var(--ease); }
+.colour-opt label:hover { border-color: var(--fg); }
+.colour-opt label:active { transform: scale(.96); }
+.colour-opt input:checked + label { border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
+.colour-opt input:focus-visible + label { outline: 2px solid var(--fg); outline-offset: 3px; }
+.colour-opt .swatch { width: 20px; height: 20px; }
+[data-theme="dark"] .swatch--black { border-color: var(--line-strong); }
+.pdp__slide img { transition: opacity var(--t-fast) var(--ease); }

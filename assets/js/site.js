@@ -25,24 +25,44 @@
     stripeCheckoutUrl: '/api/create-checkout'
   };
 
+  // Each product lists its colours. The first colour is the default.
   var PRODUCTS = {
     hoodie: {
-      id: 'hoodie', name: '+961 Hoodie', colour: 'Black', waName: 'Black Hoodie', price: 19,
-      url: 'hoodie.html', tile: 'light', thumb: 'assets/img/hoodie-front-600.webp',
-      views: [
-        { src: 'assets/img/hoodie-front-1000.webp', alt: '+961 Hoodie in black, front view with a small white +961 print on the chest' },
-        { src: 'assets/img/hoodie-back-1000.webp', alt: '+961 Hoodie in black, back view with a large white +961 print across the back' }
-      ]
+      id: 'hoodie', name: '+961 Hoodie', price: 19, url: 'hoodie.html', short: 'Hoodie',
+      colours: {
+        black: { label: 'Black', img: 'hoodie', tile: 'light',
+          alt: ['+961 Hoodie in black, front view with a small white +961 print on the chest', '+961 Hoodie in black, back view with a large white +961 print across the back'],
+          desc: 'A black hoodie with +961 printed small on the chest and large across the back. Relaxed through the body, made for every day.',
+          print: '+961 printed in white on the chest and across the back' }
+      }
     },
     tshirt: {
-      id: 'tshirt', name: '+961 T-Shirt', colour: 'White', waName: 'White T-Shirt', price: 13,
-      url: 't-shirt.html', tile: 'dark', thumb: 'assets/img/tshirt-front-600.webp',
-      views: [
-        { src: 'assets/img/tshirt-front-1000.webp', alt: '+961 T-Shirt in white, front view with a small black +961 print on the chest' },
-        { src: 'assets/img/tshirt-back-1000.webp', alt: '+961 T-Shirt in white, back view with a large black +961 print across the back' }
-      ]
+      id: 'tshirt', name: '+961 T-Shirt', price: 13, url: 't-shirt.html', short: 'T-Shirt',
+      colours: {
+        white: { label: 'White', img: 'tshirt', tile: 'dark',
+          alt: ['+961 T-Shirt in white, front view with a small black +961 print on the chest', '+961 T-Shirt in white, back view with a large black +961 print across the back'],
+          desc: 'A white t-shirt with +961 printed small on the chest and large across the back. Crew neck, short sleeves, an easy everyday fit.',
+          print: '+961 printed in black on the chest and across the back' },
+        black: { label: 'Black', img: 'tshirt-black', tile: 'light',
+          alt: ['+961 T-Shirt in black, front view with a small white +961 print on the chest', '+961 T-Shirt in black, back view, plain'],
+          desc: 'A black t-shirt with +961 printed small in white on the chest and a clean back. Crew neck, short sleeves, an easy everyday fit.',
+          print: '+961 printed in white on the chest, plain back' }
+      }
     }
   };
+  function colourKeys(id) { return Object.keys(PRODUCTS[id].colours); }
+  function validColour(id, c) { return PRODUCTS[id].colours[c] ? c : colourKeys(id)[0]; }
+  // One product in one colour, with everything the page needs to show it
+  function pv(id, colour) {
+    var p = PRODUCTS[id], key = validColour(id, colour), c = p.colours[key];
+    var img = function (view, w) { return 'assets/img/' + c.img + '-' + view + '-' + w + '.webp'; };
+    return {
+      id: id, name: p.name, price: p.price, url: p.url, colourKey: key, colour: c.label,
+      waName: c.label + ' ' + p.short, tile: c.tile, desc: c.desc, print: c.print,
+      thumb: img('front', 600), img: img,
+      views: [{ src: img('front', 1000), src600: img('front', 600), alt: c.alt[0] }, { src: img('back', 1000), src600: img('back', 600), alt: c.alt[1] }]
+    };
+  }
   var SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
   var ROUTES = ['index', 'shop', 'hoodie', 't-shirt', 'checkout', 'about', 'size-guide', 'faq', '404'];
 
@@ -110,14 +130,14 @@
       try { v = JSON.parse(store.get('961-cart') || '[]'); } catch (e) { v = []; }
       this.items = Array.isArray(v) ? v.filter(function (i) {
         return i && PRODUCTS[i.id] && SIZES.indexOf(i.size) > -1 && i.qty > 0;
-      }).map(function (i) { return { id: i.id, size: i.size, qty: Math.min(99, Math.max(1, i.qty | 0)) }; }) : [];
+      }).map(function (i) { return { id: i.id, colour: validColour(i.id, i.colour), size: i.size, qty: Math.min(99, Math.max(1, i.qty | 0)) }; }) : [];
     },
     save: function () { store.set('961-cart', JSON.stringify(this.items)); renderCart(); },
-    find: function (id, size) { return this.items.filter(function (i) { return i.id === id && i.size === size; })[0]; },
-    add: function (id, size, qty) { var it = this.find(id, size); if (it) it.qty = Math.min(99, it.qty + qty); else this.items.push({ id: id, size: size, qty: qty }); this.save(); },
-    ensure: function (id, size) { if (!this.find(id, size)) this.add(id, size, 1); },
-    set: function (id, size, qty) { var it = this.find(id, size); if (!it) return; it.qty = Math.min(99, Math.max(1, qty)); this.save(); },
-    remove: function (id, size) { this.items = this.items.filter(function (i) { return !(i.id === id && i.size === size); }); this.save(); },
+    find: function (id, colour, size) { return this.items.filter(function (i) { return i.id === id && i.colour === colour && i.size === size; })[0]; },
+    add: function (id, colour, size, qty) { colour = validColour(id, colour); var it = this.find(id, colour, size); if (it) it.qty = Math.min(99, it.qty + qty); else this.items.push({ id: id, colour: colour, size: size, qty: qty }); this.save(); },
+    ensure: function (id, colour, size) { colour = validColour(id, colour); if (!this.find(id, colour, size)) this.add(id, colour, size, 1); },
+    set: function (id, colour, size, qty) { var it = this.find(id, colour, size); if (!it) return; it.qty = Math.min(99, Math.max(1, qty)); this.save(); },
+    remove: function (id, colour, size) { this.items = this.items.filter(function (i) { return !(i.id === id && i.colour === colour && i.size === size); }); this.save(); },
     clear: function () { this.items = []; this.save(); },
     count: function () { return this.items.reduce(function (n, i) { return n + i.qty; }, 0); },
     subtotal: function () { return this.items.reduce(function (n, i) { return n + i.qty * PRODUCTS[i.id].price; }, 0); }
@@ -127,7 +147,7 @@
 
   function cartMessage() {
     var lines = Cart.items.map(function (i) {
-      var p = PRODUCTS[i.id];
+      var p = pv(i.id, i.colour);
       return '- ' + p.waName + ', size ' + i.size + ', quantity ' + i.qty + ': ' + money(p.price * i.qty);
     });
     return "Hi +961, I'd like to order:\n" + lines.join('\n') + '\nTotal: ' + money(Cart.subtotal()) + ' (delivery not included)';
@@ -149,9 +169,9 @@
     var list = $('[data-cart-lines]', cartEl), empty = $('[data-cart-empty]', cartEl), foot = $('[data-cart-foot]', cartEl);
     empty.hidden = n > 0; foot.hidden = n === 0; list.hidden = n === 0;
     list.innerHTML = Cart.items.map(function (i) {
-      var p = PRODUCTS[i.id];
-      return '<li class="line-item" data-id="' + i.id + '" data-size="' + i.size + '">' +
-        '<a class="line-item__media tile--' + p.tile + '" href="' + p.url + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + ', front view" width="600" height="750" loading="lazy" decoding="async"></a>' +
+      var p = pv(i.id, i.colour);
+      return '<li class="line-item" data-id="' + i.id + '" data-colour="' + i.colour + '" data-size="' + i.size + '">' +
+        '<a class="line-item__media tile--' + p.tile + '" href="' + p.url + (p.colourKey !== colourKeys(p.id)[0] ? '?colour=' + p.colourKey : '') + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + ', front view" width="600" height="750" loading="lazy" decoding="async"></a>' +
         '<div class="line-item__info">' +
           '<div class="line-item__top"><p class="line-item__name">' + esc(p.name) + '</p><p class="line-item__price">' + money(p.price * i.qty) + '</p></div>' +
           '<p class="small muted">' + p.colour + ' / ' + i.size + '</p>' +
@@ -173,12 +193,12 @@
     cartEl.addEventListener('click', function (e) {
       var li = e.target.closest('.line-item');
       if (!li) return;
-      var id = li.dataset.id, size = li.dataset.size, it = Cart.find(id, size);
+      var id = li.dataset.id, colour = li.dataset.colour, size = li.dataset.size, it = Cart.find(id, colour, size);
       var q = e.target.closest('[data-qty]');
-      if (q && it) { Cart.set(id, size, it.qty + parseInt(q.dataset.qty, 10)); var b = $('.line-item[data-id="' + id + '"][data-size="' + size + '"] [data-qty="' + q.dataset.qty + '"]', cartEl); if (b && !b.disabled) b.focus(); return; }
+      if (q && it) { Cart.set(id, colour, size, it.qty + parseInt(q.dataset.qty, 10)); var b = $('.line-item[data-id="' + id + '"][data-colour="' + colour + '"][data-size="' + size + '"] [data-qty="' + q.dataset.qty + '"]', cartEl); if (b && !b.disabled) b.focus(); return; }
       if (e.target.closest('[data-remove]')) {
         li.classList.add('is-leaving');
-        setTimeout(function () { Cart.remove(id, size); var c = $('[data-cart-close]', cartEl); if (!Cart.count() && c) c.focus(); }, reduce ? 0 : 300);
+        setTimeout(function () { Cart.remove(id, colour, size); var c = $('[data-cart-close]', cartEl); if (!Cart.count() && c) c.focus(); }, reduce ? 0 : 300);
       }
     });
   }
@@ -299,7 +319,7 @@
   ];
   var QUIZ_TRAITS = {
     hoodie: { sleeves: 'long', fabric: 'heavy', colour: 'black', season: 'cool', hood: 'yes', pocket: 'yes', place: 'mountain', feel: 'cosy' },
-    tshirt: { sleeves: 'short', fabric: 'light', colour: 'white', season: 'warm', hood: 'no', pocket: 'no', place: 'coast', feel: 'light' }
+    tshirt: { sleeves: 'short', fabric: 'light', colour: ['white', 'black'], season: 'warm', hood: 'no', pocket: 'no', place: 'coast', feel: 'light' }
   };
   var quizEl = $('#quiz'), quizBody = quizEl ? $('[data-quiz-body]', quizEl) : null, quiz = null, lastQuizSet = '';
   function shuffle(list) {
@@ -335,7 +355,7 @@
       '</div>', back);
   }
   function quizCard(p) {
-    return '<a class="quiz__card" href="' + p.url + '">' +
+    return '<a class="quiz__card" href="' + p.url + (p.colourKey !== colourKeys(p.id)[0] ? '?colour=' + p.colourKey : '') + '">' +
       '<span class="quiz__card-media tile--' + p.tile + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + '" width="600" height="750" decoding="async"></span>' +
       '<span class="quiz__card-info"><span class="quiz__card-name">' + esc(p.name) + '</span><span class="quiz__card-price">' + money(p.price) + '</span><span class="small muted">' + p.colour + ' / S to XXL</span><span class="quiz__card-cta">View ' + esc(p.name.replace('+961 ', 'the ').toLowerCase().replace('the ', 'the ')) + ' →</span></span>' +
     '</a>';
@@ -343,13 +363,15 @@
   function renderQuizResult() {
     var scores = Object.keys(QUIZ_TRAITS).filter(function (id) { return PRODUCTS[id]; }).map(function (id) {
       var traits = QUIZ_TRAITS[id];
-      var matched = quiz.answers.filter(function (a) { return traits[a.key] === a.value; });
+      var matched = quiz.answers.filter(function (a) { var t = traits[a.key]; return Array.isArray(t) ? t.indexOf(a.value) > -1 : t === a.value; });
       return { id: id, score: matched.length, matched: matched };
     }).sort(function (x, y) { return y.score - x.score; });
     var best = scores[0].score;
+    var colourAnswer = quiz.answers.filter(function (a) { return a.key === 'colour'; })[0];
+    var pickedColour = colourAnswer ? colourAnswer.value : null;
     var winners = scores.filter(function (s) { return s.score === best; });
     var tie = winners.length > 1;
-    var title = tie ? 'You are a 50/50.' : 'Your match: ' + PRODUCTS[winners[0].id].name + '.';
+    var title = tie ? 'You are a 50/50.' : 'Your match: ' + PRODUCTS[winners[0].id].name + (colourKeys(winners[0].id).length > 1 && pickedColour ? ' in ' + pv(winners[0].id, pickedColour).colour.toLowerCase() : '') + '.';
     var text = tie
       ? 'Your answers fit both pieces equally. Start with either, or wear one of each.'
       : 'It matches ' + best + ' of your ' + quiz.answers.length + ' answers: ' + winners[0].matched.map(function (a) { return a.label.charAt(0).toLowerCase() + a.label.slice(1); }).join(', ') + '.';
@@ -358,7 +380,7 @@
         '<p class="quiz__progress"><span>Your result</span></p>' +
         '<h2 class="quiz__q" tabindex="-1">' + esc(title) + '</h2>' +
         '<p class="small muted">' + esc(text) + '</p>' +
-        '<div class="quiz__cards' + (tie ? ' is-pair' : '') + '">' + winners.map(function (w) { return quizCard(PRODUCTS[w.id]); }).join('') + '</div>' +
+        '<div class="quiz__cards' + (tie ? ' is-pair' : '') + '">' + winners.map(function (w) { return quizCard(pv(w.id, pickedColour)); }).join('') + '</div>' +
         '<button class="quiz__back text-link small" type="button" data-quiz-restart>Take the quiz again (new questions)</button>' +
       '</div>');
   }
@@ -520,7 +542,7 @@
 
   function setFabMessage(route) {
     if (!fab) return;
-    var p = route === 'hoodie' ? PRODUCTS.hoodie : route === 't-shirt' ? PRODUCTS.tshirt : null;
+    var p = route === 'hoodie' ? pv('hoodie') : route === 't-shirt' ? pv('tshirt') : null;
     fab.href = waLink(p ? 'Hi +961, I have a question about the ' + p.waName + '.' : 'Hi +961, I have a question.');
   }
 
@@ -696,13 +718,49 @@
   function initProduct(sig) {
     var box = $('[data-product]', mainEl);
     if (!box) return;
-    var p = PRODUCTS[box.getAttribute('data-product')];
+    var id = box.getAttribute('data-product');
+    var asked = null;
+    try { asked = new URLSearchParams(location.search).get('colour'); } catch (e) { asked = null; }
+    var colourRadios = $$('input[name="colour"]', box);
+    var colour = validColour(id, asked || (colourRadios.filter(function (r) { return r.checked; })[0] || {}).value);
+    var p = pv(id, colour);
     var opts = $('.sizes__opts', box), err = $('.sizes__error', box);
     var radios = $$('input[name="size"]', box);
     var buy = $('[data-buy-now]', box), wa = $('[data-wa-product]', box), add = $('[data-add]', box);
     var size = null;
     radios.forEach(function (r) { if (r.checked) size = r.value; });
     function sync() { wa.href = waLink("Hi +961, I'd like to order the " + p.waName + (size ? ', size ' + size : '') + ' (' + money(p.price) + ').'); }
+
+    // switching colour swaps the photos, the text and what goes in the bag
+    function showColour(key, animate) {
+      colour = validColour(id, key);
+      p = pv(id, colour);
+      colourRadios.forEach(function (r) { r.checked = r.value === colour; });
+      $$('[data-colour-name]', box).forEach(function (el) { el.textContent = p.colour; });
+      var desc = $('[data-desc]', box); if (desc) desc.textContent = p.desc;
+      var print = $('[data-print]', box); if (print) print.textContent = p.print;
+      $$('.pdp__slide', box).forEach(function (slide, n) {
+        var img = $('img', slide), v = p.views[n];
+        slide.classList.remove('tile--light', 'tile--dark');
+        slide.classList.add('tile--' + p.tile);
+        var swap = function () {
+          img.src = v.src;
+          img.srcset = v.src600 + ' 600w, ' + v.src + ' 1000w';
+          img.alt = v.alt;
+          img.style.opacity = '';
+        };
+        if (animate && !reduce) { img.style.opacity = '0'; setTimeout(swap, 180); } else swap();
+      });
+      sync();
+    }
+    colourRadios.forEach(function (r) {
+      r.addEventListener('change', function () {
+        showColour(r.value, true);
+        try { history.replaceState(history.state, '', location.pathname + (colour === colourKeys(id)[0] ? '' : '?colour=' + colour)); } catch (e) { /* ignore */ }
+      }, sig);
+    });
+    if (colourRadios.length) showColour(colour, false);
+
     function hideErr() { err.classList.remove('is-visible'); setTimeout(function () { if (!err.classList.contains('is-visible')) err.hidden = true; }, 300); }
     radios.forEach(function (r) { r.addEventListener('change', function () { size = r.value; hideErr(); sync(); }, sig); });
     function need() {
@@ -719,18 +777,18 @@
     wa.addEventListener('click', function (e) { if (!need()) e.preventDefault(); }, sig);
     buy.addEventListener('click', function () {
       if (!need()) return;
-      Cart.ensure(p.id, size);
+      Cart.ensure(id, colour, size);
       morph(buy); bounceCart();
       setTimeout(function () { go(parseHref('checkout.html')); }, reduce ? 0 : 700);
     }, sig);
     add.addEventListener('click', function () {
       if (!need()) return;
-      Cart.add(p.id, size, 1);
+      Cart.add(id, colour, size, 1);
       bounceCart();
       var label = $('.buy__add-label', add), ico = $('.buy__add-icon', add);
       add.classList.remove('is-added'); void add.offsetWidth; add.classList.add('is-added');
       ico.innerHTML = ICON.check;
-      label.textContent = 'Added to bag, size ' + size;
+      label.textContent = 'Added to bag: ' + p.colour.toLowerCase() + ', size ' + size;
       clearTimeout(add._t);
       add._t = setTimeout(function () { label.textContent = 'Add to bag and keep shopping'; ico.innerHTML = ICON.plus; add.classList.remove('is-added'); }, 2200);
     }, sig);
@@ -796,7 +854,7 @@
       empty.hidden = n > 0; layout.hidden = n === 0;
       if (!n) return;
       linesEl.innerHTML = Cart.items.map(function (i) {
-        var p = PRODUCTS[i.id];
+        var p = pv(i.id, i.colour);
         return '<li class="sline"><div class="sline__media tile--' + p.tile + '"><img src="' + p.thumb + '" alt="' + esc(p.name) + ' in ' + p.colour.toLowerCase() + '" width="600" height="750" loading="lazy" decoding="async"><span class="sline__qty">' + i.qty + '</span></div>' +
           '<div><p class="sline__name">' + esc(p.name) + '</p><p class="sline__meta">' + p.colour + ' / ' + i.size + ' / Qty ' + i.qty + '</p></div>' +
           '<p class="sline__price">' + money(p.price * i.qty) + '</p></li>';
@@ -919,12 +977,12 @@
         notes: field('notes').value.trim().replace(/\s*\n\s*/g, ' '),
         billing: billingText(),
         payment: payment(), payLabel: payLabel(),
-        items: Cart.items.map(function (i) { return { id: i.id, size: i.size, qty: i.qty }; }),
+        items: Cart.items.map(function (i) { return { id: i.id, colour: i.colour, size: i.size, qty: i.qty }; }),
         subtotal: Cart.subtotal(), fee: f, total: Cart.subtotal() + (f || 0)
       };
     }
     function itemLines(o) {
-      return o.items.map(function (i) { var p = PRODUCTS[i.id]; return p.waName + ', size ' + i.size + ', quantity ' + i.qty + ': ' + money(p.price * i.qty); });
+      return o.items.map(function (i) { var p = pv(i.id, i.colour); return p.waName + ', size ' + i.size + ', quantity ' + i.qty + ': ' + money(p.price * i.qty); });
     }
     function totalText(o) { return money(o.total) + (o.fee === null ? ' + shipping' : ''); }
     function waMessage(o) {
@@ -966,7 +1024,7 @@
         botcheck: false,
         'Order number': o.ref,
         'Order summary': o.items.map(function (i) {
-          var p = PRODUCTS[i.id];
+          var p = pv(i.id, i.colour);
           return i.qty + ' x ' + p.name + ' (' + p.colour + ', size ' + i.size + '): ' + money(p.price * i.qty);
         }).join(' | '),
         'Subtotal': money(o.subtotal),

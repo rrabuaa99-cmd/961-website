@@ -6,13 +6,14 @@ export const PRODUCTS = {
   tshirt: { name: '+961 T-Shirt', colour: 'White', cents: 1300 }
 };
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+export const COLOURS = { hoodie: { black: 'Black' }, tshirt: { white: 'White', black: 'Black' } };
 export const DELIVERY_LEBANON_CENTS = 400; // PLACEHOLDER: keep equal to deliveryLebanon in assets/js/site.js
 
 export function cleanItems(raw) {
   return (Array.isArray(raw) ? raw : [])
     .slice(0, 20)
     .filter((i) => i && PRODUCTS[i.id] && SIZES.includes(i.size))
-    .map((i) => ({ id: i.id, size: i.size, qty: Math.min(99, Math.max(1, parseInt(i.qty, 10) || 1)) }));
+    .map((i) => ({ id: i.id, colour: COLOURS[i.id][i.colour] ? i.colour : Object.keys(COLOURS[i.id])[0], size: i.size, qty: Math.min(99, Math.max(1, parseInt(i.qty, 10) || 1)) }));
 }
 
 export function itemsCents(items) {
