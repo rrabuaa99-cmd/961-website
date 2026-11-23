@@ -802,7 +802,7 @@ html.has-cursor .pdp__slide button { cursor: none; }
 .step__key { font-family: var(--serif); font-size: 24px; line-height: 1.1; font-variant-numeric: lining-nums; }
 .step p { font-size: 15px; line-height: 1.6; color: var(--muted); }
 .step strong { display: block; color: var(--fg); font-weight: 500; margin-bottom: 2px; }
-.diagram { width: 100%; max-width: 360px; height: auto; color: var(--fg); }
+
 
 /* ---------- FAQ ---------- */
 .faq { row-gap: var(--s6); }
@@ -1201,3 +1201,89 @@ html.has-bag .co__empty { display: none; }
   .back-btn { margin: 0 var(--s4) 0 -4px; }
   .back-btn::after { content: ""; position: absolute; right: calc(var(--s4) / -2); top: 50%; width: 1px; height: 16px; margin-top: -8px; background: currentColor; opacity: .25; }
 }
+
+
+/* ---------------------------------------------------------------- size chart
+   Drawing, how to measure, and the table. Lays itself out by the space it gets
+   (home page, size guide page or the size window), so it fits every screen. */
+.chart { container-type: inline-size; }
+.chart__in { display: grid; gap: var(--s4); }
+.chart__figure { margin: 0; padding: clamp(16px, 6cqi, 48px) clamp(12px, 5cqi, 40px); border: 1px solid var(--line); display: grid; place-items: center; }
+.diagram { display: block; width: 100%; height: auto; color: var(--fg); overflow: visible; --dg-w: 1.8; }
+.diagram--tshirt { max-width: 360px; }
+.diagram--hoodie { max-width: 500px; --dg-w: 2.3; }
+.diagram .dg-out, .diagram .dg-line, .diagram .dg-soft, .diagram .dg-stitch, .diagram .dg-arrow, .diagram .dg-ext, .diagram .dg-tip { fill: none; stroke: currentColor; stroke-linejoin: round; stroke-linecap: round; }
+.diagram .dg-out { stroke-width: var(--dg-w); }
+.diagram .dg-line { stroke-width: calc(var(--dg-w) * .8); }
+.diagram .dg-soft { stroke-width: calc(var(--dg-w) * .7); opacity: .4; }
+.diagram .dg-stitch { stroke-width: calc(var(--dg-w) * .55); stroke-dasharray: 4 3.5; opacity: .6; stroke-linecap: butt; }
+.diagram .dg-tip { stroke-width: calc(var(--dg-w) * 1.8); stroke-linecap: butt; }
+.diagram .dg-arrow { stroke-width: calc(var(--dg-w) * .7); }
+.diagram .dg-head { fill: currentColor; }
+.diagram .dg-ext { stroke-width: calc(var(--dg-w) * .55); stroke-dasharray: 1.5 4; opacity: .55; }
+.diagram .dg-num circle { fill: currentColor; }
+.diagram .dg-num text { fill: var(--bg); font-family: var(--sans); font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.diagram--tshirt .dg-num text { font-size: 15px; }
+.diagram--hoodie .dg-num text { font-size: 19px; }
+.diagram .dg-m { transition: opacity var(--t-base) var(--ease); }
+
+.m-num { display: inline-grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--fg); color: var(--bg); font: 600 12px/1 var(--sans); font-variant-numeric: lining-nums tabular-nums; letter-spacing: 0; }
+.chart__key { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); align-content: center; }
+.chart__key li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start; transition: opacity var(--t-base) var(--ease); }
+.chart__key p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); }
+.chart__key strong { display: block; margin-bottom: 2px; font-size: 16px; font-weight: 500; color: var(--fg); }
+.chart__tables { display: grid; gap: var(--s4); min-width: 0; order: 1; }
+.chart__key { order: 2; }
+.chart__table { display: grid; gap: var(--s1); min-width: 0; }
+.chart__sub { font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+.size-table { min-width: 0; }
+.size-table th, .size-table td { text-align: center; padding: 14px 6px; }
+.size-table th:first-child, .size-table td:first-child { width: 17%; }
+.size-table thead th { vertical-align: bottom; white-space: normal; line-height: 1.25; padding-top: 4px; font-size: 13px; letter-spacing: 0; text-transform: none; }
+.size-table thead .m-num { display: grid; width: 20px; height: 20px; margin: 0 auto 6px; font-size: 11px; }
+.size-table tbody tr:nth-child(even) { background: var(--field); }
+.size-table td { transition: color var(--t-fast) var(--ease), font-weight var(--t-fast) var(--ease); }
+
+@container (min-width: 460px) and (max-width: 719px) { .chart__key { grid-template-columns: 1fr 1fr; column-gap: var(--s3); } }
+@container (min-width: 600px) { .size-table thead th { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; } }
+@container (min-width: 720px) {
+  .chart__in { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: clamp(32px, 6cqi, 80px); row-gap: var(--s5); align-items: center; }
+  .chart__tables { grid-column: 1 / -1; order: 0; }
+  .chart__key { order: 0; }
+}
+@container (min-width: 900px) { .chart__tables:has(> :nth-child(2)) { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); column-gap: var(--s5); } }
+@container (max-width: 359px) {
+  .chart__key p { font-size: 14px; }
+  .size-table { font-size: 14px; }
+  .size-table thead th { font-size: 11.5px; }
+  .size-table th, .size-table td { padding-left: 2px; padding-right: 2px; }
+}
+
+/* point at a measurement (in the list, the table or the drawing) and the drawing shows just that one */
+@media (hover: hover) {
+  .chart:has([data-m="1"]:hover) .dg-m:not([data-m="1"]), .chart:has([data-m="2"]:hover) .dg-m:not([data-m="2"]),
+  .chart:has([data-m="3"]:hover) .dg-m:not([data-m="3"]), .chart:has([data-m="4"]:hover) .dg-m:not([data-m="4"]) { opacity: .14; }
+  .chart:has([data-m="1"]:hover) .chart__key li:not([data-m="1"]), .chart:has([data-m="2"]:hover) .chart__key li:not([data-m="2"]),
+  .chart:has([data-m="3"]:hover) .chart__key li:not([data-m="3"]), .chart:has([data-m="4"]:hover) .chart__key li:not([data-m="4"]) { opacity: .4; }
+  .chart:has([data-m="1"]:hover) td[data-m="1"], .chart:has([data-m="2"]:hover) td[data-m="2"],
+  .chart:has([data-m="3"]:hover) td[data-m="3"], .chart:has([data-m="4"]:hover) td[data-m="4"] { font-weight: 600; }
+}
+
+/* home page */
+.fit .tabs { margin-bottom: var(--s4); }
+.fit__note { margin-top: var(--s3); max-width: 60ch; }
+
+/* size guide page */
+.guide { display: grid; gap: clamp(64px, 9vw, 128px); }
+.guide__block { display: grid; gap: var(--s3); min-width: 0; }
+.guide__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); padding-bottom: var(--s2); border-bottom: 1px solid var(--line); }
+.guide__help { display: grid; gap: var(--s3); justify-items: start; max-width: 640px; }
+
+/* size window on product pages */
+.modal .chart__in { gap: var(--s3); }
+.modal .chart__figure { padding: 12px; }
+.modal .diagram--hoodie { max-width: 400px; }
+.modal .diagram--tshirt { max-width: 260px; }
+.guide { margin-top: var(--s4); }
+.modal__foot { margin-top: var(--s3); }

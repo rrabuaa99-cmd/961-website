@@ -575,7 +575,7 @@
           var r = el.getBoundingClientRect();
           if (r.height && r.top < vh && r.bottom > band) hide = true;
         });
-        // never cover a link, button or field
+        // never cover a link, button, field or size table
         if (!hide && doc.elementsFromPoint) {
           var pts = [[fr.left - 4, fr.top + 4], [fr.left - 4, fr.bottom - 4], [fr.left + fr.width / 2, fr.top - 4], [fr.left + fr.width / 2, fr.top + fr.height / 2], [fr.right - 4, fr.bottom - 4]];
           for (var k = 0; k < pts.length && !hide; k++) {
@@ -583,7 +583,7 @@
             for (var s = 0; s < stack.length; s++) {
               var el2 = stack[s];
               if (el2 === fab || fab.contains(el2) || el2.closest('.cursor')) continue;
-              if (el2.closest('a, button, input, textarea, select, label, [role="tab"]')) hide = true;
+              if (el2.closest('a, button, input, textarea, select, label, [role="tab"], .size-table')) hide = true;
               break;
             }
           }
@@ -875,6 +875,32 @@
         clearTimeout(t);
         t = setTimeout(function () { if (ST) ST.refresh(); if (lenis) lenis.resize(); }, 560);
       }, sig);
+    });
+  }
+
+  // tabs inside a page (the size chart on the home page)
+  function initTabs(sig) {
+    $$('[data-tabs]', mainEl).forEach(function (box) {
+      var tabs = $$('[role="tab"]', box), t0 = 0;
+      function select(t, focus) {
+        tabs.forEach(function (x) {
+          var on = x === t, panel = document.getElementById(x.getAttribute('aria-controls'));
+          x.setAttribute('aria-selected', on ? 'true' : 'false');
+          x.tabIndex = on ? 0 : -1;
+          if (panel) panel.hidden = !on;
+        });
+        if (focus) t.focus();
+        clearTimeout(t0);
+        t0 = setTimeout(function () { if (ST) ST.refresh(); if (lenis) lenis.resize(); }, 60);
+      }
+      tabs.forEach(function (t, n) {
+        t.addEventListener('click', function () { select(t); }, sig);
+        t.addEventListener('keydown', function (e) {
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          e.preventDefault();
+          select(tabs[(n + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length], true);
+        }, sig);
+      });
     });
   }
 
@@ -1420,6 +1446,7 @@
     initProduct(sig);
     initAccordions(sig);
     initSizeGuideLinks(sig);
+    initTabs(sig);
     initCheckout(sig);
     initAnchors(sig);
     initMotion(sig);
