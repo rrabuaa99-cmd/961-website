@@ -14,7 +14,7 @@
     instagram: 'https://www.instagram.com/961o.fficial/',
     deliveryLebanon: 4,                  // PLACEHOLDER: delivery fee in USD inside Lebanon
 
-    // Every order is emailed to rrabuaa99@gmail.com through Web3Forms (free).
+    // Every order is emailed to your Gmail inbox through Web3Forms (free).
     // This access key is linked to that inbox. It is public by design.
     web3formsKey: '4537d6ea-4e0d-40dd-b674-000211899699',
 
@@ -1040,6 +1040,7 @@
     function showPaymentChoices() {
       var abroad = dest !== 'lebanon';
       $('#pay-cod', co).closest('.choice').hidden = abroad;
+      $('#pay-whish', co).closest('.choice').hidden = abroad;
       if (cardInput) cardInput.closest('.choice').hidden = abroad || !cardOn;
       quoteInput.closest('.choice').hidden = !abroad;
       var current = form.querySelector('input[name="payment"]:checked');
@@ -1064,6 +1065,7 @@
       $('[data-co-delivery]', co).textContent = f === null ? 'Quoted after you order' : money(f);
       $('[data-co-total]', co).textContent = money(Cart.subtotal() + (f || 0));
       $('[data-co-total-note]', co).hidden = f !== null;
+      refreshWhish();
       $$('[data-co-count]', co).forEach(function (el) { el.textContent = n + (n === 1 ? ' item' : ' items'); });
     }
     render();
@@ -1076,6 +1078,38 @@
     function payment() { var r = form.querySelector('input[name="payment"]:checked'); return r ? r.value : null; }
     function payLabel() { var r = form.querySelector('input[name="payment"]:checked'); return r ? r.getAttribute('data-label') : ''; }
     function paysByCard() { return payment() === 'card' && dest === 'lebanon'; }
+    function paysByWhish() { return payment() === 'whish' && dest === 'lebanon'; }
+    function orderTotal() { return Cart.subtotal() + (fee() || 0); }
+
+    // Whish Money: the customer gives the name and number of their Whish account,
+    // and the order email tells the shop to send a Whish payment request for the exact total
+    var whishBox = $('[data-whish-fields]', co), whishAmount = $('[data-whish-amount]', co);
+    var whName = form.elements.whishName, whPhone = form.elements.whishPhone;
+    [['fullname', whName], ['phone', whPhone]].forEach(function (pair) {
+      var src = form.elements[pair[0]], dst = pair[1];
+      src.addEventListener('input', function () { if (!dst.getAttribute('data-edited')) dst.value = src.value; }, sig);
+      dst.addEventListener('input', function () { if (dst.value.trim()) dst.setAttribute('data-edited', '1'); else dst.removeAttribute('data-edited'); }, sig);
+    });
+    function whishNote() {
+      return 'When you press Pay, we send a Whish payment request for ' + money(orderTotal()) + ' to your Whish number. Approve it in your Whish app to complete your order.';
+    }
+    function refreshWhish() {
+      if (!whishBox) return;                                       // the first render runs before this is set up
+      whishAmount.textContent = money(orderTotal());
+      var on = paysByWhish();
+      if (whishBox.hidden === on) {
+        whishBox.hidden = !on;
+        if (on) {
+          if (!whName.value.trim()) whName.value = field('fullname').value.trim();
+          if (!whPhone.value.trim()) whPhone.value = field('phone').value.trim();
+        }
+        if (ST) ST.refresh();
+      }
+      if (on) {
+        if (!sending) $('.btn__label', submitBtn).textContent = submitLabel();
+        note.textContent = whishNote();
+      }
+    }
 
     // the button and note under the form follow the payment method
     var NOTES = {
@@ -1083,12 +1117,13 @@
       card: 'Next, enter your Visa or Mastercard details in the secure card form. Your order is confirmed as soon as the payment goes through.',
       intl: 'Nothing is charged now. We contact you with the shipping cost and how to pay.'
     };
-    function submitLabel() { return paysByCard() ? 'Continue to payment' : 'Place order'; }
+    function submitLabel() { return paysByCard() ? 'Continue to payment' : paysByWhish() ? 'Pay ' + money(orderTotal()) + ' with Whish' : 'Place order'; }
     function updateSubmit() {
       if (!sending) $('.btn__label', submitBtn).textContent = submitLabel();
       note.textContent = dest !== 'lebanon' ? NOTES.intl : (NOTES[payment()] || NOTES.cod);
       notice.hidden = true;
       cardNote('');
+      refreshWhish();
     }
 
     // destination
@@ -1132,6 +1167,12 @@
         ['address', function (v) { return v.trim().length >= 6; }]
       ];
       if (dest !== 'lebanon') checks.push(['country', function (v) { return v.trim().length >= 2; }]);
+      if (paysByWhish()) {
+        checks.push(['whishName', function (v) { return v.trim().length >= 2; }]);
+        checks.push(['whishPhone', function (v) { return v.replace(/\D/g, '').length >= 7; }]);
+      } else {
+        setInvalid(whName, false); setInvalid(whPhone, false);
+      }
       checks.forEach(function (c) {
         var el = field(c[0]); var ok = c[1](el.value);
         setInvalid(el, !ok); if (!ok) bad.push(el);
@@ -1149,7 +1190,7 @@
       setTimeout(function () { first.focus({ preventScroll: true }); }, reduce ? 0 : 500);
       return false;
     }
-    ['fullname', 'phone', 'email', 'city', 'address', 'country'].forEach(function (n) {
+    ['fullname', 'phone', 'email', 'city', 'address', 'country', 'whishName', 'whishPhone'].forEach(function (n) {
       var el = field(n);
       if (el) el.addEventListener('input', function () { if (el.closest('.field').classList.contains('is-invalid')) validate(); }, sig);
     });
@@ -1177,6 +1218,8 @@
         notes: field('notes').value.trim().replace(/\s*\n\s*/g, ' '),
         billing: billingText(),
         payment: payment(), payLabel: payLabel(),
+        whishName: paysByWhish() ? whName.value.trim() : '',
+        whishPhone: paysByWhish() ? whPhone.value.trim() : '',
         items: Cart.items.map(function (i) { return { id: i.id, colour: i.colour, size: i.size, qty: i.qty }; }),
         subtotal: Cart.subtotal(), fee: f, total: Cart.subtotal() + (f || 0)
       };
@@ -1200,6 +1243,7 @@
         'Address: ' + o.address,
         'Payment: ' + o.payLabel
       ];
+      if (o.whishPhone) out.push('Whish account: ' + o.whishName + ', ' + o.whishPhone);
       if (o.email) out.push('Email: ' + o.email);
       if (o.notes) out.push('Notes: ' + o.notes);
       if (o.billing && o.billing !== 'Same as shipping address') out.push('Billing address: ' + o.billing);
@@ -1209,6 +1253,7 @@
       if (o.intl) return 'Nothing charged yet. Send the shipping quote and how to pay';
       if (o.payment === 'cod') return 'Cash on delivery, collect ' + money(o.total);
       if (o.payment === 'card') return 'Card (Stripe), PAID ' + money(o.total) + (o.sessionId ? '. Stripe session ' + o.sessionId : '');
+      if (o.payment === 'whish') return 'Whish Money, NOT PAID YET. In your Whish app, request ' + money(o.total) + ' from ' + o.whishName + ', ' + o.whishPhone + '. Ship once the money arrives';
       return o.payLabel;
     }
     function sendOrder(o, status, subject) {
@@ -1219,7 +1264,7 @@
       // The email lists the order in the same order as the checkout form
       var body = {
         access_key: CONFIG.web3formsKey,
-        subject: subject || 'New +961 order ' + o.ref + ': ' + totalText(o) + ', ' + o.payLabel,
+        subject: subject || 'New +961 order ' + o.ref + ': ' + totalText(o) + ', ' + o.payLabel + (o.payment === 'whish' ? ' (request the payment)' : ''),
         from_name: '+961 Website',
         botcheck: false,
         'Order number': o.ref,
@@ -1240,6 +1285,12 @@
         'Payment': status,
         'Billing address': o.billing
       };
+      if (o.payment === 'whish') {                                // listed right after Payment
+        delete body['Billing address'];
+        body['Whish name'] = o.whishName;
+        body['Whish phone number'] = o.whishPhone;
+        body['Billing address'] = o.billing;
+      }
       if (o.email) body.replyto = o.email;                       // press Reply to answer the customer
       // Sent as a plain form, so browsers send it straight away without an extra check
       var data = new FormData();
@@ -1282,10 +1333,17 @@
       var o = collect();
       if (paysByCard()) { startCard(o); return; }
       var kind = o.intl ? 'intl' : o.payment;
-      if (EMBEDDED) { showConfirmation(o, kind, { preview: true }); return; }
+      // Whish: the button shows the request being sent, for at least a moment so it can be read
+      var started = Date.now(), whish = kind === 'whish';
+      var after = function (fn) { setTimeout(fn, whish ? Math.max(0, 1600 - (Date.now() - started)) : 0); };
+      if (EMBEDDED) {
+        if (whish) { setSending(true, 'Sending payment request'); after(function () { showConfirmation(o, kind, { preview: true }); }); }
+        else showConfirmation(o, kind, { preview: true });
+        return;
+      }
       if (!CONFIG.web3formsKey) { showNotice('Online orders are not switched on yet. Send this order on WhatsApp and we will confirm it there.', o); return; }
-      setSending(true);
-      sendOrder(o, statusFor(o)).then(function () { showConfirmation(o, kind); }, function (err) {
+      setSending(true, whish ? 'Sending payment request' : '');
+      sendOrder(o, statusFor(o)).then(function () { after(function () { showConfirmation(o, kind); }); }, function (err) {
         setSending(false);
         if (window.console) console.warn('Order email failed:', err && err.message);
         showNotice('We could not send your order. Check your connection and try again, or send it on WhatsApp instead.', o);
@@ -1372,6 +1430,7 @@
       var copy = {
         cod: ['Thank you, ' + first + '.', 'We have your order. We will call you on ' + o.phone + ' to arrange delivery, and you pay ' + money(o.total) + ' in cash when it arrives.'],
         card: ['Thank you, ' + first + '.', 'Your card payment of ' + money(o.total) + ' went through and your order is confirmed. We will call you on ' + o.phone + ' to arrange delivery.'],
+        whish: ['Thank you, ' + first + '.', 'We have your order. We will send a Whish payment request for ' + money(o.total) + ' to ' + o.whishPhone + '. Approve it in your Whish app, and we will call you to arrange delivery.'],
         intl: ['Thank you, ' + first + '.', 'We have your order. Nothing has been charged. We will contact you on ' + o.phone + ' with the shipping cost to ' + o.dest + ' and how to pay.'],
         whatsapp: ['Thank you, ' + first + '.', 'Your order is ready in WhatsApp. Press send to confirm it, and we will reply with your delivery details.']
       }[kind] || ['Thank you, ' + first + '.', 'We have your order.'];
@@ -1383,6 +1442,11 @@
         var t = $('[data-confirm-txn]', node);
         t.textContent = 'Keep your order number. If you do not hear from us within a day, message us on WhatsApp.';
         t.hidden = false;
+      }
+      if (kind === 'whish') {
+        var wt = $('[data-confirm-txn]', node);
+        wt.textContent = 'Your order is confirmed once the payment arrives. Nothing has been taken from your account yet.';
+        wt.hidden = false;
       }
       if (kind === 'whatsapp') {
         var waBtn = $('[data-confirm-wa]', node);

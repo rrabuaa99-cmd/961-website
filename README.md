@@ -23,11 +23,12 @@ A complete static website for +961. It needs no server code or database: upload 
 
 ## How orders reach you
 
-Checkout happens on the site. Each order is emailed to rrabuaa99@gmail.com with its order number, items, total, payment method and the customer's name, phone, email and address. If the customer gave an email, pressing Reply in your inbox answers them directly.
+Checkout happens on the site. Each order is emailed to your Gmail inbox with its order number, items, total, payment method and the customer's name, phone, email and address. If the customer gave an email, pressing Reply in your inbox answers them directly.
 
 | Payment | What the customer sees |
 | --- | --- |
 | Cash on delivery | Place order, then a thank-you screen telling them you will call to arrange delivery. |
+| Whish Money | They enter the name and phone number of their Whish account and press "Pay $X with Whish". Your email says NOT PAID YET with the exact amount, name and number. In your Whish app, send them a payment request for that amount. Ship once the money arrives. |
 | Debit or credit card | Continue to payment opens Stripe's secure card form inside the checkout. They pay with Visa or Mastercard, and your email says PAID with the Stripe session number. |
 | Outside Lebanon | Place order with nothing charged. You contact them with the shipping cost and how to pay. |
 
@@ -39,9 +40,9 @@ Both settings are at the top of `assets/js/site.js`, inside `CONFIG`.
 
 **1. Orders by email (already set up)**
 
-Every order is emailed to **rrabuaa99@gmail.com** through Web3Forms (web3forms.com, free). Each email lists the order number, order summary, subtotal, delivery fee, total, full name, phone number, email, delivery (Lebanon or the country abroad), city or area, full address, order notes and payment. If the customer gave an email, pressing Reply answers them.
+Every order is emailed to **your Gmail inbox** through Web3Forms (web3forms.com, free). Each email lists the order number, order summary, subtotal, delivery fee, total, full name, phone number, email, delivery (Lebanon or the country abroad), city or area, full address, order notes and payment. If the customer gave an email, pressing Reply answers them.
 
-The access key is `web3formsKey` in `assets/js/site.js`. It is linked to rrabuaa99@gmail.com and is public by design. To send orders to another inbox, create a new key at web3forms.com with that address and replace it.
+The access key is `web3formsKey` in `assets/js/site.js`. It is linked to your Gmail address and is public by design. To send orders to another inbox, create a new key at web3forms.com with that address and replace it.
 
 **2. Card payments (Stripe: Visa and Mastercard)**
 

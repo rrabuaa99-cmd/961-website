@@ -859,7 +859,7 @@ html.has-cursor .pdp__slide button { cursor: none; }
 .co__step-num { font-family: var(--serif); font-size: 18px; color: var(--muted); font-variant-numeric: lining-nums; }
 .fields { display: grid; gap: var(--s3); }
 @media (min-width: 768px) { .fields--2 { grid-template-columns: 1fr 1fr; } }
-.field { display: grid; gap: var(--s1); min-width: 0; }
+.field { display: grid; gap: var(--s1); min-width: 0; align-content: start; }
 .field__label { font-size: 13px; font-weight: 500; letter-spacing: .02em; display: flex; justify-content: space-between; gap: var(--s1); }
 .field__opt { color: var(--muted); font-weight: 400; }
 .field__input {
@@ -1059,6 +1059,14 @@ html.has-bag .co__empty { display: none; }
 .billing { display: grid; gap: var(--s3); }
 .billing:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
 @keyframes billing-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* Whish Money details */
+.whish { display: grid; gap: var(--s3); padding: var(--s3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+.whish:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
+.whish__amount { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); font-size: 15px; }
+.whish__amount span:first-child { font-weight: 500; }
+.whish__amount span:last-child { font-family: var(--serif); font-size: 28px; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+@media (max-width: 359px) { .whish { padding: var(--s2); } }
 
 /* ---------- main photo on the home page ---------- */
 .hero__media { height: auto; max-height: none; align-items: center; }
