@@ -1060,16 +1060,6 @@ html.has-bag .co__empty { display: none; }
 .billing:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
 @keyframes billing-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
-/* Whish Money details */
-.choice__title--logo { display: inline-flex; align-items: center; gap: 10px; }
-.pay-logo { flex: none; width: 24px; height: 24px; margin-block: -2px; }
-.whish { display: grid; gap: var(--s3); padding: var(--s3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
-.whish:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
-.whish__amount { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); font-size: 15px; }
-.whish__amount span:first-child { font-weight: 500; }
-.whish__amount span:last-child { font-family: var(--serif); font-size: 28px; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
-@media (max-width: 359px) { .whish { padding: var(--s2); } }
-
 /* ---------- main photo on the home page ---------- */
 .hero__media { height: auto; max-height: none; align-items: center; }
 .hero__frame { width: 100%; height: auto; aspect-ratio: 1284 / 860; max-width: 100%; }

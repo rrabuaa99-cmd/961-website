@@ -28,7 +28,6 @@ Checkout happens on the site. Each order is emailed to your Gmail inbox with its
 | Payment | What the customer sees |
 | --- | --- |
 | Cash on delivery | Place order, then a thank-you screen telling them you will call to arrange delivery. |
-| Whish Money | They enter the name and phone number of their Whish account and press "Pay $X with Whish". Your email says NOT PAID YET with the exact amount, name and number. From your Whish account on +961 3 179 666, send them a payment request for that amount. Ship once the money arrives. |
 | Debit or credit card | Continue to payment opens Stripe's secure card form inside the checkout. They pay with Visa or Mastercard, and your email says PAID with the Stripe session number. |
 | Outside Lebanon | Place order with nothing charged. You contact them with the shipping cost and how to pay. |
 
