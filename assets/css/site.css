@@ -1061,6 +1061,8 @@ html.has-bag .co__empty { display: none; }
 @keyframes billing-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
 /* Whish Money details */
+.choice__title--logo { display: inline-flex; align-items: center; gap: 10px; }
+.pay-logo { flex: none; width: 24px; height: 24px; margin-block: -2px; }
 .whish { display: grid; gap: var(--s3); padding: var(--s3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
 .whish:not([hidden]) { animation: billing-in var(--t-base) var(--ease) both; }
 .whish__amount { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); font-size: 15px; }

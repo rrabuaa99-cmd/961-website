@@ -1253,7 +1253,7 @@
       if (o.intl) return 'Nothing charged yet. Send the shipping quote and how to pay';
       if (o.payment === 'cod') return 'Cash on delivery, collect ' + money(o.total);
       if (o.payment === 'card') return 'Card (Stripe), PAID ' + money(o.total) + (o.sessionId ? '. Stripe session ' + o.sessionId : '');
-      if (o.payment === 'whish') return 'Whish Money, NOT PAID YET. In your Whish app, request ' + money(o.total) + ' from ' + o.whishName + ', ' + o.whishPhone + '. Ship once the money arrives';
+      if (o.payment === 'whish') return 'Whish Money, NOT PAID YET. From your Whish account on +961 3 179 666, request ' + money(o.total) + ' from ' + o.whishName + ', ' + o.whishPhone + '. Ship once the money arrives';
       return o.payLabel;
     }
     function sendOrder(o, status, subject) {
